@@ -1,0 +1,22 @@
+.logo {
+	font-family: 'Baumans', cursive;
+	font-weight: bold;
+}
+.logo-big {
+	font-size: 10em;
+	line-height: 150px;
+	text-shadow: $teal 4px 4px 4px;
+}
+.logo-small {
+	font-size: 4em;
+	line-height: 80px;
+	text-shadow: $teal 2px 2px 2px;
+}
+
+#splash-form {
+	font-size: 2em;
+}
+
+.track-artist {
+	font-size: .8em;
+}

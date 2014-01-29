@@ -1,0 +1,32 @@
+<div class="container">
+  <h1 class="logo logo-small">bingio</h1>
+  <div class="row">
+    <div class="col-md-4" id="sidebar">
+      <button class="btn btn-default btn-block">
+        <i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Game</button>
+
+      <ul id="sidebar-games" class="well">
+        <li ng-repeat="game in games">
+          <a ng-click="enter_game(game.name)">{{game.name}}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-md-8">
+      <div class="row">
+        <form id="chat-form">
+          <div class="col-xs-10">
+            <input id="chat-input" type="text"
+                  class="form-control" required maxlength="500"
+                  title="Chat text (max 500 characters)" />
+          </div>
+          <div class="col-xs-2">
+            <button id="chat-btn" class="btn btn-default btn-block" type="submit">
+              Chat&nbsp;&nbsp;<i class="fa fa-comment"></i></button>
+          </div>
+        </form>
+      </div>
+      <div id="chat-log" class="well well-sm"></div>
+    </div>
+  </div>
+</div>

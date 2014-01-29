@@ -1,0 +1,34 @@
+body {
+	background-image: url(/static/img/brushed.png);
+}
+
+button {
+	border-color: $teal;
+}
+
+td:hover {
+	outline: 1px solid $teal;
+}
+
+a {
+	color: #fc6;
+}
+a:visited {
+	color: #fc6;
+}
+a:hover {
+	color: #EBBC5E;
+	text-decoration: none;
+}
+
+.logo {
+    color: #566;
+}
+
+.track-artist {
+	color: #556;
+}
+
+.fa {
+	color: $teal;
+}
