@@ -7,14 +7,15 @@ import random
 import uuid
 
 urls = (
-    '/query', 'query',
-    '/collection', 'collection',
     '/authentication', 'authentication',
+    '/chat', 'chat',
+    '/collection', 'collection',
     '/debug', 'debug',
+    '/favicon.ico', 'icon',
     '/games/(.+)/users', 'gameusers',
     '/games/(.+)', 'game',
     '/games', 'games',
-    '/chat', 'chat',
+    '/query', 'query',
     '/', 'default'
     )
 app = web.application(urls, globals())
@@ -42,6 +43,12 @@ class collection:
         user = rdio().findUser(vanityName=user_data.user)
         resp = rdio().getTracksInCollection(user=user['key'], count=25)
         return json.dumps(resp)
+
+
+# Process favicon.ico requests
+class icon:
+    def GET(self):
+        raise web.seeother("/static/favicon.ico")
 
 
 class query:
