@@ -37,6 +37,19 @@ def rdio():
 
 games_store = []
 
+
+class authentication:
+    def GET(self):
+        return json.dumps({'state': bool(rdio().authenticated)})
+
+    def POST(self):
+        url = rdio().begin_authentication('http://' + web.ctx.host)
+        web.redirect(url)
+
+    def DELETE(self):
+        rdio().logout()
+
+
 class collection:
     def GET(self):
         user_data = web.input()
@@ -57,17 +70,6 @@ class query:
         resp = rdio().search(query=user_data.query, types=user_data.types)
         return json.dumps(resp)
 
-
-class authentication:
-    def GET(self):
-        return json.dumps({'state': bool(rdio().authenticated)})
-
-    def POST(self):
-        url = rdio().begin_authentication('http://' + web.ctx.host)
-        web.redirect(url)
-
-    def DELETE(self):
-        rdio().logout()
 
 class gameusers:
     def POST(self, name):

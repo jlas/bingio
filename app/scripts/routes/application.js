@@ -1,9 +1,10 @@
 /*global define*/
 
 define([
+    "models/authentication",
     "views/lobby",
     "views/splash"
-], function (LobbyView, SplashView) {
+], function (authModel, LobbyView, SplashView) {
     "use strict";
 
     var routeViews = {
@@ -39,7 +40,26 @@ define([
     var router = new ApplicationRouter();
 
     var routeCb = function(route, params) {
-        router.switchView(route);
+        if (route !== "splash") {
+            /**
+             * If user is not auth'ed and tries to get non-splash page, send
+             * them to splash.
+             */
+            authModel.fetch({
+                success: function() {
+                    if (authModel.get("state") === true) {
+                        router.switchView(route);
+                    } else {
+                        router.switchView("splash");
+                    }
+                },
+                error: function(model, xhr, options) {
+                    $("#error").text(xhr.responseText).show().fadeOut(5000);
+                }
+            });
+        } else {
+            router.switchView("splash");
+        }
     };
 
     router.on("route", routeCb);
