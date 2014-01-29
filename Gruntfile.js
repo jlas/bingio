@@ -23,7 +23,7 @@ module.exports = function (grunt) {
     var yeomanConfig = {
         app: 'app',
         dist: 'dist',
-        tmp: 'app/grunt-tmp'
+        tmp: 'app/grunt_tmp'
     };
 
     grunt.initConfig({
