@@ -10,23 +10,36 @@ td:hover {
 	outline: 1px solid $teal;
 }
 
-a {
-	color: #fc6;
-}
-a:visited {
-	color: #fc6;
-}
 a:hover {
-	color: #EBBC5E;
-	text-decoration: none;
+	text-decoration: none !important;
+}
+
+a.chat-entry-me {
+	color: red;
+}
+a.chat-entry-me:hover {
+	color: darkred;
+}
+a.chat-entry-me:visited {
+	color: red;
+}
+
+a.chat-entry-other {
+	color: blue;
+}
+a.chat-entry-other:hover {
+	color: darkblue;
+}
+a.chat-entry-other:visited {
+	color: blue;
 }
 
 .logo {
-    color: #566;
+    color: $darkteal;
 }
 
 .track-artist {
-	color: #556;
+	color: $purple;
 }
 
 .fa {

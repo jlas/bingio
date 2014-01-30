@@ -41,11 +41,12 @@ define([
             clearTimeout(CHAT_TIMEOUTID);
         },
 
-        sendMessage: function(user, msg, successFunc) {
+        sendMessage: function(userName, userUrl, msg, successFunc) {
             var chatCollection = this;
 
             chatCollection.create({
-                "user": user,
+                "userName": userName,
+                "userUrl": userUrl,
                 "msg": msg
             }, {
                 wait: true,

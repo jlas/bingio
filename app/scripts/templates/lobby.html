@@ -2,21 +2,16 @@
   <h1 class="logo logo-small">bingio</h1>
   <div class="row">
     <div class="col-md-4" id="sidebar">
-      <button class="btn btn-default btn-block">
+      <button id="create-game-btn" class="btn btn-default btn-block">
         <i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Game</button>
-
-      <ul id="sidebar-games" class="well">
-        <li ng-repeat="game in games">
-          <a ng-click="enter_game(game.name)">{{game.name}}</a>
-        </li>
-      </ul>
+      <ul id="sidebar-games" class="well"></ul>
     </div>
 
     <div class="col-md-8">
       <div class="row">
         <form id="chat-form">
           <div class="col-xs-10">
-            <input id="chat-input" type="text"
+            <input id="chat-input" type="text" autocomplete="off"
                   class="form-control" required maxlength="500"
                   title="Chat text (max 500 characters)" />
           </div>
@@ -27,6 +22,65 @@
         </form>
       </div>
       <div id="chat-log" class="well well-sm"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="create-game-modal" tabindex="-1" role="dialog"
+    aria-labelledby="createGame" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form id="create-game-form" class="form-horizontal">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Create New Game</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="game-name" class="col-xs-4 control-label">Name</label>
+            <div class="col-xs-8">
+              <input type="text" class="form-control" id="game-name-input" placeholder="Game Name"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-xs-4 control-label">What music to use?</label>
+            <div class="col-xs-8">
+              <div class="radio">
+                <label>
+                  <input name="source" value="charts" type="radio" checked/>
+                  Top Charts
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="source" value="collection" type="radio"/>
+                  My Collection
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="source" value="playlist" type="radio" id="playlist-btn"/>
+                  A Playlist
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" id="playlist-input-container" style="display:none">
+            <label for="input-playlist" class="col-xs-4 control-label">Playlist</label>
+            <div class="col-xs-8">
+              <input type="text" class="form-control" placeholder="Playlist Name" id="playlist-input"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Create Game!</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -2,9 +2,17 @@
 @import url(http://fonts.googleapis.com/css?family=Baumans);
 
 $teal: #6aa;
+$darkteal: #566;
+$blue: #EBBC5E;
+$gold: #fc6;
+$purple: #556;
+$red: red;
 
 $font-family-sans-serif: "Open Sans";
 $btn-default-border: $teal;
+$btn-default-color: $darkteal;
+$link-color: $blue;
+$link-hover-color: $purple;
 
 @import 'layout';
 @import 'typography';

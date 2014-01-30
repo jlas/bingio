@@ -48,7 +48,7 @@ define([
             authModel.fetch({
                 success: function() {
                     if (authModel.get("state") === true) {
-                        router.switchView(route);
+                        router.switchView(route, {"authModel": authModel});
                     } else {
                         router.switchView("splash");
                     }
