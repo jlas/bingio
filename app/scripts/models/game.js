@@ -8,7 +8,20 @@ define([
 
     var GameModel = Backbone.Model.extend({
         idAttribute: "_id",
-        defaults: {}
+        urlRoot: "/games",
+        defaults: {},
+
+        addPlayer: function(curUser, successCb) {
+            var users = this.get("users");
+            users[curUser["id"]] = curUser;
+            this.save({"users": users}).done(successCb);
+        },
+
+        removePlayer: function(userId, successCb) {
+            var users = this.get("users");
+            delete users[userId];
+            this.save({"users": users}).done(successCb);
+        }
     });
 
     return GameModel;

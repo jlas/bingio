@@ -2,24 +2,27 @@
 
 define([
     "models/authentication",
+    "views/game",
     "views/lobby",
     "views/splash"
-], function (authModel, LobbyView, SplashView) {
+], function (authModel, GameView, LobbyView, SplashView) {
     "use strict";
 
     var routeViews = {
-        "lobby" : LobbyView,
-        "splash" : SplashView
+        "game": GameView,
+        "lobby": LobbyView,
+        "splash": SplashView
     };
 
     var ApplicationRouter = Backbone.Router.extend({
         routes: {
-            "" : "splash",
-            "lobby" : "lobby",
-            "splash" : "splash"
+            "": "splash",
+            "game": "game",
+            "lobby": "lobby",
+            "splash": "splash",
         },
 
-        switchView : function(route, options) {
+        switchView: function(route, options) {
             Backbone.history.navigate(route);
 
             // unset the current view and set a new one
@@ -48,7 +51,7 @@ define([
             authModel.fetch({
                 success: function() {
                     if (authModel.get("state") === true) {
-                        router.switchView(route, {"authModel": authModel});
+                        router.switchView(route, {"curUser": authModel.get("userData")});
                     } else {
                         router.switchView("splash");
                     }

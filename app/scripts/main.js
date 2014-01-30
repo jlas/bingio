@@ -28,7 +28,8 @@ require.config({
         modernizr: '../bower_components/modernizr/modernizr',
         'requirejs-text': '../bower_components/requirejs-text/text',
         requirejs: '../bower_components/requirejs/require',
-        'sass-bootstrap': '../bower_components/sass-bootstrap/dist/js/bootstrap'
+        'sass-bootstrap': '../bower_components/sass-bootstrap/dist/js/bootstrap',
+        'cookies-js': '../bower_components/cookies-js/cookies'
     }
 });
 

@@ -1,0 +1,51 @@
+<div>
+  <table class="table table-bordered">
+
+    <% for (var i = 0; i < this.rows.length; i++) { %>
+
+    <tr data-sizey="1" data-sizex="1">
+
+      <%
+        for (var j = 0; j < this.rows[i].length; j++) {
+          var track = rows[i][j];
+      %>
+
+      <td id="<%= track.key %>">
+        <p class="track-name"><%= track.name %></p>
+        <p class="track-artist"><%= track.artist %></p>
+      </td>
+
+      <% } %>
+
+    </tr>
+
+    <% } %>
+
+  </table>
+
+</div>
+
+<div class="container">
+  <div class="row">
+    <ul id="users">
+      <%
+        var users = this.game.get("users") || {};
+        _.each(users, function(user, id) {
+      %>
+      <li>
+        <a href="http://www.rdio.com<%= user.url %>">
+          <img src="<%= user.icon %>" alt="icon"/>
+        </a>
+        <p><%= user.name %></p>
+      </li>
+      <% }); %>
+    </ul>
+  </div>
+
+  <div class="row">
+    <button id="quit-game-btn" class="btn btn-default btn-lg" type="button">
+      <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Quit Game</button>
+  </div>
+
+  <div id="playback"></div>
+</div>

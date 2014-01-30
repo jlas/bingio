@@ -2,6 +2,7 @@
   "name": "bingio2",
   "version": "0.0.0",
   "dependencies": {
+    "cookies-js": "~0.1.0",
     "sass-bootstrap": "~3.0.0",
     "jquery": "~1.9.0",
     "underscore": "~1.4.3",

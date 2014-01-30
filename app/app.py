@@ -9,13 +9,10 @@ import uuid
 urls = (
     "/authentication", "authentication",
     "/chat", "chat",
-    "/collection", "collection",
     "/debug", "debug",
     "/favicon.ico", "icon",
-    "/games/(.+)/users", "gameusers",
     "/games/(.+)", "game",
     "/games", "games",
-    "/query", "query",
     "/", "default"
     )
 app = web.application(urls, globals())
@@ -63,9 +60,13 @@ class authentication:
         user = rdio().currentUser(extras='["username"]')
         return json.dumps({
             "state": bool(rdio().authenticated),
-            "userName": user["username"],
-            "userUrl": user["url"]
-            })
+            "userData": {
+                "name": user["username"],
+                "url": user["url"],
+                "id": user["key"],
+                "icon": user["icon"]
+            }
+        })
 
     def POST(self):
         url = rdio().begin_authentication(web.ctx.homedomain)
@@ -75,40 +76,29 @@ class authentication:
         rdio().logout()
 
 
-class collection:
-    def GET(self):
-        user_data = web.input()
-        user = rdio().findUser(vanityName=user_data.user)
-        resp = rdio().getTracksInCollection(user=user["key"], count=25)
-        return json.dumps(resp)
-
-
 # Process favicon.ico requests
 class icon:
     def GET(self):
         raise web.seeother("/static/favicon.ico")
 
 
-class gameusers:
-    def POST(self, name):
-        if not rdio().authenticated:
-            return
-
+class game:
+    def GET(self, _id):
         for game in games_store:
-            if game["name"] == name:
+            if game["_id"] == _id:
+                return json.dumps(game)
+
+    def PUT(self, _id):
+        for game in games_store:
+            if game["_id"] == _id:
                 break
         else:
             return
+        userData = json.loads(web.data())
+        game["users"] = userData["users"]
+        web.setcookie("game", _id)
+        return resp("200", "Ok")
 
-        data = web.input()
-        users = game.setdefault("users", [])
-        users.append(rdio().currentUser(extras='["username"]'))
-
-class game:
-    def GET(self, name):
-        for game in games_store:
-            if game["name"] == name:
-                return json.dumps(game)
 
 class games:
     def GET(self):
@@ -121,27 +111,30 @@ class games:
         playlist = user_data.get("playlist")  # could be optional
 
         domain = web.ctx.host.split(":")[0]
-
         game = {
+            "_id": str(uuid.uuid4().get_hex()),
             "name": name,
-            "playback_token": rdio().getPlaybackToken(domain=domain)
+            "playback_token": rdio().getPlaybackToken(domain=domain),
+            "users": {}
             }
 
         user = rdio().currentUser()
         if source == "collection":
             tracks = rdio().getTracksInCollection(user=user["key"], count=25)
-            game["tracks"] = tracks
+
+        elif source == "charts":
+            tracks = rdio().getTopCharts(type="Track", count=25)
 
         elif source == "playlist" and playlist:
             playlists = rdio().getUserPlaylists(user=user["key"], extras='["tracks"]')
             for pl in playlists:
                 if pl["name"] == playlist:
-                    game["tracks"] = pl["tracks"]
+                    tracks = pl["tracks"]
                     break
 
+        game["tracks"] = tracks
         games_store.append(game)
         return resp("201", "Created")
-
 
 
 chatlog = []
@@ -166,13 +159,6 @@ class default:
             web.seeother("static/index.html#lobby")
         else:
             web.seeother("static/index.html")
-
-
-class query:
-    def GET(self):
-        user_data = web.input()
-        resp = rdio().search(query=user_data.query, types=user_data.types)
-        return json.dumps(resp)
 
 
 class debug:

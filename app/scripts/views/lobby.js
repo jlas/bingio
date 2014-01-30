@@ -19,11 +19,12 @@ define([
             "submit #chat-form": "sendChat",
             "submit #create-game-form": "createGame",
             "click #create-game-btn": "renderModal",
-            "click input[name='source']": "togglePlaylistInput"
+            "click input[name='source']": "togglePlaylistInput",
+            "click .enter-game": "enterGame"
         },
 
         initialize: function(options) {
-            this.authModel = options.authModel;
+            this.curUser = options.curUser;
 
             this.chatCollection = new ChatCollection();
             this.chatCollection.on("sync", this.renderChat, this);
@@ -40,7 +41,7 @@ define([
         },
 
         renderChat: function() {
-            var curUserUrl = this.authModel.get("userUrl");
+            var curUserUrl = this.curUser.url;
             var $chatlog = this.$el.find("#chat-log");
             var chattmpl = _.template("<p><a class='<%= cssClass %>' " +
                 "href='http://www.rdio.com<%= userUrl %>'><%= userName %>:</a>" +
@@ -62,11 +63,14 @@ define([
 
         renderGames: function() {
             var $games = this.$el.find("#sidebar-games");
-            var gametmpl = _.template("<li><a href=''><%= name %></a></li>");
+            var gametmpl = _.template(
+                "<li><button class='enter-game btn btn-link' data-game-id='<%= _id %>'>" +
+                "<%= name %></a></li>");
             $games.empty();
             this.gamesCollection.each(function(entry) {
                 $games.append(gametmpl({
-                    "name": entry.get("name")
+                    "name": entry.get("name"),
+                    "_id": entry.get("_id")
                 }));
             });
         },
@@ -75,8 +79,8 @@ define([
             evt.preventDefault();
             var $chatin = this.$el.find("#chat-input");
             this.chatCollection.sendMessage(
-                this.authModel.get('userName'),
-                this.authModel.get('userUrl'),
+                this.curUser.name,
+                this.curUser.url,
                 $chatin.val(),
                 function() {$chatin.val("");});
         },
@@ -94,11 +98,21 @@ define([
                 wait: true,
                 success: function() {
                     $("#create-game-modal").modal('hide');
-                    console.log('success');
                 },
                 error: function(model, xhr, options) {
                     $("#error").text(xhr.responseText).show().fadeOut(5000);
                 }
+            });
+        },
+
+        enterGame: function(evt) {
+            evt.preventDefault();
+            var gameId = $(evt.currentTarget).attr('data-game-id');
+            var game = this.gamesCollection.get(gameId);
+            game.addPlayer(this.curUser, function() {
+                Backbone.history.navigate('game', {
+                    trigger : true
+                });
             });
         },
 
