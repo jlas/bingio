@@ -54,7 +54,7 @@ define([
                     }
                 },
                 error: function(model, xhr, options) {
-                    $("#error").text(xhr.responseText).show().fadeOut(5000);
+                    router.switchView("splash");
                 }
             });
         } else {
