@@ -6,8 +6,9 @@ define([
     'backbone',
     'cookies-js',
     'requirejs-text!templates/game.html',
-    'models/game'
-], function ($, _, Backbone, Cookies, tmpl, GameModel) {
+    'models/game',
+    'helpers/util'
+], function ($, _, Backbone, Cookies, tmpl, GameModel, Util) {
     'use strict';
 
     var GameView = Backbone.View.extend({
@@ -52,6 +53,7 @@ define([
                         trigger : true
                     });
             });
+            Util.doLoading();
         }
     });
 

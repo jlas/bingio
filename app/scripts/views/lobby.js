@@ -9,8 +9,9 @@ define([
     "requirejs-text!templates/lobby.html",
     "collections/chat",
     "collections/games",
-    "models/chat"
-], function ($, _, Backbone, Bootstrap, Cookies, tmpl, ChatCollection, GamesCollection, ChatModel) {
+    "models/chat",
+    "helpers/util"
+], function ($, _, Backbone, Bootstrap, Cookies, tmpl, ChatCollection, GamesCollection, ChatModel, Util) {
     "use strict";
 
     // uuid generator
@@ -115,7 +116,7 @@ define([
             }, {
                 wait: true,
                 success: function() {
-                    $("#create-game-modal").modal("hide");
+
                     game.fetch({
                         success: function() { enterGame(game); }
                     });
@@ -124,6 +125,8 @@ define([
                     $("#error").text(xhr.responseText).show().fadeOut(5000);
                 }
             });
+
+            Util.doLoading();
         },
 
         enterGame: function(game) {
@@ -133,6 +136,7 @@ define([
                     trigger : true
                 });
             });
+            Util.doLoading();
         },
 
         clickGame: function(evt) {
