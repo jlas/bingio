@@ -116,15 +116,28 @@ class game:
     def PATCH(self, _id):
         userData = json.loads(web.data())
         game = gameStore[_id]
-        game["users"] = userData["users"]
-        if len(game["users"]) == 0:
-            del gameStore[_id]
+
+        if "users" in userData:
+            oldUsers = set(game["users"].keys())
+            newUsers = set(userData["users"].keys())
+            addedUsers = newUsers.difference(oldUsers)
+
+            # create a randomized layout for the game board
+            for addedUser in addedUsers:
+                board = range(25)
+                random.shuffle(board)
+                userData["users"][addedUser]["board"] = board
+
+            game["users"] = userData["users"]
+            if len(game["users"]) == 0:
+                del gameStore[_id]
+
         return resp("200", "Ok", game)
 
 
 class games:
     def GET(self):
-        return json.dumps(gameStore)
+        return json.dumps(gameStore.values())
 
 
 chatlog = []
