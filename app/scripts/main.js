@@ -29,7 +29,8 @@ require.config({
         'requirejs-text': '../bower_components/requirejs-text/text',
         requirejs: '../bower_components/requirejs/require',
         'sass-bootstrap': '../bower_components/sass-bootstrap/dist/js/bootstrap',
-        'cookies-js': '../bower_components/cookies-js/cookies'
+        'cookies-js': '../bower_components/cookies-js/cookies',
+        'jquery.rdio': '../bower_components/jquery.rdio/jquery.rdio'
     }
 });
 
