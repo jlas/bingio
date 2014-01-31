@@ -14,13 +14,13 @@ define([
         addPlayer: function(curUser, successCb) {
             var users = this.get("users");
             users[curUser["id"]] = curUser;
-            this.save({"users": users}).done(successCb);
+            this.save({"users": users}, {patch: true}).done(successCb);
         },
 
         removePlayer: function(userId, successCb) {
             var users = this.get("users");
             delete users[userId];
-            this.save({"users": users}).done(successCb);
+            this.save({"users": users}, {patch: true}).done(successCb);
         }
     });
 

@@ -33,26 +33,21 @@ def rdio():
     return rdio
 
 
-def resp(code, status, message=None, data=None):
+def resp(code, status, data=None):
     """Return a wrapped response and set response status.
     @param code: http return code
     @param status: success, error, failure
-    @param message: message if err/failure
-    @param data: detailed info if err/failure
+    @param data: data to return
     @return json string
     """
     web.ctx.status = " ".join([code, status])
-    resp = {
-        "code": code,
-        "status": status
-    }
-    if not message is None:
-        resp['message'] = message
     if not data is None:
-        resp['data'] = data
+        resp = data
+    else:
+        resp = {"code": code, "status": status}
     return json.dumps(resp)
 
-games_store = []
+gameStore = {}
 
 
 class authentication:
@@ -84,11 +79,9 @@ class icon:
 
 class game:
     def GET(self, _id):
-        for game in games_store:
-            if game["_id"] == _id:
-                return json.dumps(game)
+        return json.dumps(gameStore[_id])
 
-    def createGame(self, _id):
+    def PUT(self, _id):
         userData = json.loads(web.data())
         name = userData["name"]
         source = userData["source"]
@@ -117,27 +110,21 @@ class game:
                     break
 
         game["tracks"] = tracks
-        games_store.append(game)
-        return resp("201", "Created")
+        gameStore[_id] = game
+        return resp("201", "Created", game)
 
-    def updateGame(self, game):
+    def PATCH(self, _id):
         userData = json.loads(web.data())
+        game = gameStore[_id]
         game["users"] = userData["users"]
         if len(game["users"]) == 0:
-            games_store.remove(game)
-        return resp("200", "Ok")
-
-    def PUT(self, _id):
-        for game in games_store:
-            if game["_id"] == _id:
-                return self.updateGame(game)
-        else:
-            return self.createGame(_id)
+            del gameStore[_id]
+        return resp("200", "Ok", game)
 
 
 class games:
     def GET(self):
-        return json.dumps(games_store)
+        return json.dumps(gameStore)
 
 
 chatlog = []
