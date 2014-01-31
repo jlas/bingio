@@ -91,8 +91,12 @@ class game:
         game = {
             "_id": _id,
             "name": name,
-            "playback_token": rdio().getPlaybackToken(domain=domain),
-            "users": {}
+            "playbackToken": rdio().getPlaybackToken(domain=domain),
+            "tracks": {},
+            "users": {},
+            "playing": 0,
+            "playingTrack": None,
+            "toGuess": []
             }
 
         user = rdio().currentUser()
@@ -111,6 +115,7 @@ class game:
 
         trackFields = ["key", "name", "artist"]
         game["tracks"] = [dict([(k, track[k]) for k in trackFields]) for track in tracks]
+        game["toGuess"] = [track["key"] for track in tracks]
         gameStore[_id] = game
         return resp("201", "Created", game)
 
@@ -132,6 +137,14 @@ class game:
             game["users"] = userData["users"]
             if len(game["users"]) == 0:
                 del gameStore[_id]
+
+        if "playState" in userData:
+            game["playState"] = userData["playState"]
+            if userData["playState"]:
+                game["playingTrack"] = random.choice(game["toGuess"])
+            else:
+                game["playingTrack"] = None
+
 
         return resp("200", "Ok", game)
 

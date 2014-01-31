@@ -11,11 +11,18 @@ define([
 ], function ($, _, Backbone, Cookies, tmpl, GameModel, Util) {
     'use strict';
 
+    function toggleStateButtons() {
+        $("#start-game-btn").toggle();
+        $("#pause-game-btn").toggle();
+    }
+
     var GameView = Backbone.View.extend({
         template: _.template(tmpl),
 
         events: {
-            "click #quit-game-btn": "quitGame"
+            "click #quit-game-btn": "quitGame",
+            "click #start-game-btn": "toggleState",
+            "click #pause-game-btn": "toggleState"
         },
 
         initialize: function() {
@@ -54,6 +61,12 @@ define([
                     });
             });
             Util.doLoading();
+        },
+
+        toggleState: function() {
+            this.game.toggleState(function() {
+                toggleStateButtons();
+            });
         }
     });
 

@@ -21,6 +21,13 @@ define([
             var users = this.get("users");
             delete users[userId];
             this.save({"users": users}, {patch: true}).done(successCb);
+        },
+
+        toggleState: function(successCb) {
+            this.save(
+                {"playState": !this.get("playState")},
+                {patch: true})
+            .done(successCb);
         }
     });
 
