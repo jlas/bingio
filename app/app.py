@@ -88,31 +88,15 @@ class game:
             if game["_id"] == _id:
                 return json.dumps(game)
 
-    def PUT(self, _id):
-        for game in games_store:
-            if game["_id"] == _id:
-                break
-        else:
-            return
+    def createGame(self, _id):
         userData = json.loads(web.data())
-        game["users"] = userData["users"]
-        web.setcookie("game", _id)
-        return resp("200", "Ok")
-
-
-class games:
-    def GET(self):
-        return json.dumps(games_store)
-
-    def POST(self):
-        user_data = json.loads(web.data())
-        name = user_data["name"]
-        source = user_data["source"]
-        playlist = user_data.get("playlist")  # could be optional
+        name = userData["name"]
+        source = userData["source"]
+        playlist = userData.get("playlist")  # could be optional
 
         domain = web.ctx.host.split(":")[0]
         game = {
-            "_id": str(uuid.uuid4().get_hex()),
+            "_id": _id,
             "name": name,
             "playback_token": rdio().getPlaybackToken(domain=domain),
             "users": {}
@@ -136,13 +120,30 @@ class games:
         games_store.append(game)
         return resp("201", "Created")
 
+    def updateGame(self, game):
+        userData = json.loads(web.data())
+        game["users"] = userData["users"]
+        return resp("200", "Ok")
+
+    def PUT(self, _id):
+        for game in games_store:
+            if game["_id"] == _id:
+                return self.updateGame(game)
+        else:
+            return self.createGame(_id)
+
+
+class games:
+    def GET(self):
+        return json.dumps(games_store)
+
 
 chatlog = []
 
 class chat:
     def GET(self):
-        user_data = web.input(since=0)
-        since = int(user_data.since)
+        userData = web.input(since=0)
+        since = int(userData.since)
         return json.dumps(chatlog[since:])
 
     def POST(self):
@@ -154,8 +155,8 @@ class chat:
 class default:
     def GET(self):
         if rdio().authenticating:
-            user_data = web.input()
-            rdio().complete_authentication(user_data["oauth_verifier"])
+            userData = web.input()
+            rdio().complete_authentication(userData["oauth_verifier"])
             web.seeother("static/index.html#lobby")
         else:
             web.seeother("static/index.html")

@@ -5,12 +5,21 @@ define([
     "underscore",
     "backbone",
     "bootstrap",
+    "cookies-js",
     "requirejs-text!templates/lobby.html",
     "collections/chat",
     "collections/games",
     "models/chat"
-], function ($, _, Backbone, Bootstrap, tmpl, ChatCollection, GamesCollection, ChatModel) {
+], function ($, _, Backbone, Bootstrap, Cookies, tmpl, ChatCollection, GamesCollection, ChatModel) {
     "use strict";
+
+    // uuid generator
+    function uuid() {
+        function s4() {
+            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        }
+        return s4()+s4()+s4()+s4()+s4()+s4()+s4()+s4();
+    }
 
     var LobbyView = Backbone.View.extend({
         template: _.template(tmpl),
@@ -20,7 +29,7 @@ define([
             "submit #create-game-form": "createGame",
             "click #create-game-btn": "renderModal",
             "click input[name='source']": "togglePlaylistInput",
-            "click .enter-game": "enterGame"
+            "click .enter-game": "clickGame"
         },
 
         initialize: function(options) {
@@ -33,6 +42,11 @@ define([
             this.gamesCollection = new GamesCollection();
             this.gamesCollection.on("sync", this.renderGames, this);
             this.gamesCollection.startFetching();
+        },
+
+        cleanUp: function() {
+            this.gamesCollection.stopFetching();
+            this.chatCollection.stopFetching();
         },
 
         render: function() {
@@ -90,14 +104,21 @@ define([
             var name = $("#game-name-input").val();
             var source = $("input[name='source']:checked").val();
             var playlist = $("#playlist-input").val();
-            this.gamesCollection.create({
+            var gameId = uuid();
+            var enterGame = _.bind(this.enterGame, this);
+
+            var game = this.gamesCollection.create({
+                "_id": gameId,
                 "name": name,
                 "source": source,
                 "playlist": playlist
             }, {
                 wait: true,
                 success: function() {
-                    $("#create-game-modal").modal('hide');
+                    $("#create-game-modal").modal("hide");
+                    game.fetch({
+                        success: function() { enterGame(game); }
+                    });
                 },
                 error: function(model, xhr, options) {
                     $("#error").text(xhr.responseText).show().fadeOut(5000);
@@ -105,15 +126,20 @@ define([
             });
         },
 
-        enterGame: function(evt) {
-            evt.preventDefault();
-            var gameId = $(evt.currentTarget).attr('data-game-id');
-            var game = this.gamesCollection.get(gameId);
+        enterGame: function(game) {
             game.addPlayer(this.curUser, function() {
-                Backbone.history.navigate('game', {
+                Cookies.set("game", game.get("_id"));
+                Backbone.history.navigate("game", {
                     trigger : true
                 });
             });
+        },
+
+        clickGame: function(evt) {
+            evt.preventDefault();
+            var gameId = $(evt.currentTarget).attr("data-game-id");
+            var game = this.gamesCollection.get(gameId);
+            this.enterGame(game);
         },
 
         renderModal: function() {

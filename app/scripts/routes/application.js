@@ -30,6 +30,10 @@ define([
                 console.log("cleanup!");
                 this.currentView.remove();
                 this.currentView.unbind();
+
+                if (this.currentView.cleanUp !== undefined) {
+                    this.currentView.cleanUp();
+                }
             }
 
             var ViewCls = routeViews[route];
