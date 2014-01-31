@@ -23,14 +23,12 @@ td {
 	margin: 0 20px 0 20px;
 }
 
-#splash-form p {
-	text-align: center;
-	margin-top: 40px;
-}
-
+#splash-form > p:first-child { margin-top: 40px; }
+#splash-form p { text-align: center; }
+#splash-form input { margin-top: 20px; }
 #splash-form img {
 	position: relative;
-	top: -5px;
+	top: -3px;
 }
 
 .logo {
