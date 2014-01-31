@@ -109,7 +109,8 @@ class game:
                     tracks = pl["tracks"]
                     break
 
-        game["tracks"] = tracks
+        trackFields = ["key", "name", "artist"]
+        game["tracks"] = [dict([(k, track[k]) for k in trackFields]) for track in tracks]
         gameStore[_id] = game
         return resp("201", "Created", game)
 
