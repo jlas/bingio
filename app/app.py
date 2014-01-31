@@ -123,6 +123,8 @@ class game:
     def updateGame(self, game):
         userData = json.loads(web.data())
         game["users"] = userData["users"]
+        if len(game["users"]) == 0:
+            games_store.remove(game)
         return resp("200", "Ok")
 
     def PUT(self, _id):
