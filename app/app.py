@@ -101,17 +101,23 @@ class game:
 
         user = rdio().currentUser()
         if source == "collection":
-            tracks = rdio().getTracksInCollection(user=user["key"], count=25)
+            tracks = rdio().getTracksInCollection(
+                user=user["key"], sort="playCount", count=100)
 
         elif source == "charts":
-            tracks = rdio().getTopCharts(type="Track", count=25)
+            tracks = rdio().getTopCharts(type="Track", count=50)
 
         elif source == "playlist" and playlist:
-            playlists = rdio().getUserPlaylists(user=user["key"], extras='["tracks"]')
+            playlists = rdio().getUserPlaylists(
+                user=user["key"], extras='["tracks"]')
             for pl in playlists:
-                if pl["name"] == playlist:
+                if pl["name"].lower() == playlist.lower():
                     tracks = pl["tracks"]
                     break
+
+        if len(tracks) > 25:
+            random.shuffle(tracks)
+            tracks = tracks[:25]
 
         trackFields = ["key", "name", "artist"]
         game["tracks"] = [dict([(k, track[k]) for k in trackFields]) for track in tracks]
