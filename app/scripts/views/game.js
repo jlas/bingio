@@ -20,7 +20,7 @@ define([
     }
 
     function playbackWatcher(game) {
-        var oldPlayingTrack = game.get("playingTrack");
+        var oldPlayingTrack = null;
         var playbackToken = game.get("playbackToken");
         function monitorPlayingTrack() {
             var newPlayingTrack = game.get("playingTrack");
@@ -28,6 +28,7 @@ define([
                 if (newPlayingTrack === null) {
                     $('#playback').rdio().stop();
                 } else {
+                    $('#playback').rdio().stop();
                     $('#playback').rdio().play(newPlayingTrack);
                 }
                 oldPlayingTrack = newPlayingTrack;
@@ -54,36 +55,44 @@ define([
             this.curUser = this.options.curUser;
             var gameId = Cookies.get("game");
             this.game = new GameModel({_id: gameId});
-            // this.game.on("sync", this.render, this);
+            this.game.on("sync", this.render, view);
 
             var view = this;
             this.game.fetch().done(function () {
-                var board = view.game.get("users")[view.curUser["id"]]["board"];
-                var tracks = view.game.get("tracks");
-                var rows = view.rows;
-                var k = 0;
-                for (var i = 0; i < 5; i++) {
-                    rows[i] = [];
-                    for (var j = 0; j < 5; j++) {
-                        rows[i][j]= tracks[board[k++]];
-                    }
-                }
-                view.render();
-
-                if (view.game.get("playState") === true) {
-                    toggleStateButtons();
-                }
-
                 playbackWatcher(view.game);
+                view.render();
             });
         },
 
         cleanUp: function() {
+            $('#playback').rdio().stop();
             clearTimeout(PLAY_TIMEOUTID);
         },
 
         render: function() {
+            if (this.game === undefined || this.game.get("playState") === undefined) {
+                console.log("dont render");
+                return this;
+            }
+            console.log("render");
+
+            var board = this.game.get("users")[this.curUser["id"]]["board"];
+            var tracks = this.game.get("tracks");
+            var rows = this.rows;
+            var k = 0;
+            for (var i = 0; i < 5; i++) {
+                rows[i] = [];
+                for (var j = 0; j < 5; j++) {
+                    rows[i][j]= tracks[board[k++]];
+                }
+            }
+
             this.$el.html(this.template(this));
+
+            if (this.game.get("playState") === true) {
+                toggleStateButtons();
+            }
+
             return this;
         },
 

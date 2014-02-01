@@ -116,7 +116,6 @@ define([
             }, {
                 wait: true,
                 success: function() {
-
                     game.fetch({
                         success: function() { enterGame(game); }
                     });
@@ -126,7 +125,10 @@ define([
                 }
             });
 
-            Util.doLoading();
+            $("#create-game-modal").modal("hide");
+            $(window).on('hidden.bs.modal', function (e) {
+                Util.doLoading();
+            });
         },
 
         enterGame: function(game) {

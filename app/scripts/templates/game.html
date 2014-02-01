@@ -8,9 +8,14 @@
       <%
         for (var j = 0; j < this.rows[i].length; j++) {
           var track = rows[i][j];
+          var cssClass = (track.guessedBy !== null) ? "guessed" : "";
+          var guessedByMe = (track.guessedBy === this.curUser["id"]);
       %>
 
-      <td class="game-square" id="<%= track.key %>">
+      <td class="game-square <%= cssClass %>" id="<%= track.key %>">
+        <% if (guessedByMe) { %>
+          <i class="fa fa-check"></i>
+        <% } %>
         <p class="track-name"><%= track.name %></p>
         <p class="track-artist"><%= track.artist %></p>
       </td>

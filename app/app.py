@@ -152,11 +152,14 @@ class game:
             if len(game["users"]) == 0:
                 del gameStore[_id]
 
+        def pickNewTrack(game):
+            toGuess = filter(lambda t: not bool(t[1]["guessedBy"]), game["tracks"].iteritems())
+            game["playingTrack"] = random.choice([k for k, v in toGuess])
+
         if "playState" in userData:
             game["playState"] = userData["playState"]
             if userData["playState"]:
-                toGuess = filter(lambda t: not bool(t[1]["guessedBy"]), game["tracks"].iteritems())
-                game["playingTrack"] = random.choice([k for k, v in toGuess])
+                pickNewTrack(game)
             else:
                 game["playingTrack"] = None
 
@@ -169,14 +172,17 @@ class game:
             playingTrackId = game["playingTrack"]
 
             if playingTrackId is not None and playState:
-                # user guessed correctly
-                if guessedTrackId == playingTrackId:
-                    user["rightGuesses"] += 1
-                    game["tracks"][guessedTrackId]["guessedBy"] = userId
+                alreadyGuessed = bool(game["tracks"][guessedTrackId]["guessedBy"])
+                if not alreadyGuessed:
+                    # user guessed correctly
+                    if guessedTrackId == playingTrackId:
+                        user["rightGuesses"] += 1
+                        game["tracks"][guessedTrackId]["guessedBy"] = userId
+                        pickNewTrack(game)
 
-                # user guessed incorrectly
-                else:
-                    user["wrongGuesses"] += 1
+                    # user guessed incorrectly
+                    else:
+                        user["wrongGuesses"] += 1
 
         return resp("200", "Ok", game)
 
