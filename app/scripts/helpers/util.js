@@ -8,7 +8,7 @@ define([
     var that = {};
 
     that.doLoading = function () {
-        $("body").html(
+        $("#app").html(
             "<p id='loading'><i class='fa fa-spinner fa-spin'></i>&nbsp;Loading...</p>");
     }
 

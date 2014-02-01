@@ -28,6 +28,11 @@ define([
                 {"playState": !this.get("playState")},
                 {patch: true})
             .done(successCb);
+        },
+
+        guessTrack: function(userId, trackId, successCb) {
+            var guess = {"trackId": trackId, "userId": userId};
+            this.save({"guess":guess}, {patch: true}).done(successCb);
         }
     });
 

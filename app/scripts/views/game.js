@@ -45,7 +45,8 @@ define([
         events: {
             "click #quit-game-btn": "quitGame",
             "click #start-game-btn": "toggleState",
-            "click #pause-game-btn": "toggleState"
+            "click #pause-game-btn": "toggleState",
+            "click .game-square": "guessTrack"
         },
 
         initialize: function() {
@@ -99,6 +100,17 @@ define([
         toggleState: function() {
             this.game.toggleState(function() {
                 toggleStateButtons();
+            });
+        },
+
+        guessTrack: function(evt) {
+            evt.preventDefault();
+            var trackId = $(evt.currentTarget).attr("id");
+            var userId = this.curUser["id"];
+
+            var view = this;
+            this.game.guessTrack(userId, trackId, function() {
+                view.render();
             });
         }
     });

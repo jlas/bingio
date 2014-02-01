@@ -61,3 +61,12 @@ td {
 	text-align: center;
 	margin-top: 2em;
 }
+
+/* [X] symbols for wrong guesses */
+$x-symbol-align: -95px;
+.fa-stack > .fa-times { top: $x-symbol-align - 2px; }
+.fa-stack > .fa-square-o { top: $x-symbol-align; }
+.fa-stack > .fa-times.text-default, .fa-stack > .fa-square-o.text-default {
+	color: black;
+	opacity: .3;
+}

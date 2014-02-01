@@ -94,9 +94,8 @@ class game:
             "playbackToken": rdio().getPlaybackToken(domain=domain),
             "tracks": {},
             "users": {},
-            "playing": 0,
-            "playingTrack": None,
-            "toGuess": []
+            "playState": False,
+            "playingTrack": None
             }
 
         user = rdio().currentUser()
@@ -119,9 +118,9 @@ class game:
             random.shuffle(tracks)
             tracks = tracks[:25]
 
-        trackFields = ["key", "name", "artist"]
-        game["tracks"] = [dict([(k, track[k]) for k in trackFields]) for track in tracks]
-        game["toGuess"] = [track["key"] for track in tracks]
+        trackFields = ["key", "name", "artist", "guessedBy"]
+        tracks = [dict([(k, track.get(k, None)) for k in trackFields]) for track in tracks]
+        game["tracks"] = dict([(track["key"], track) for track in tracks])
         gameStore[_id] = game
         return resp("201", "Created", game)
 
@@ -134,11 +133,20 @@ class game:
             newUsers = set(userData["users"].keys())
             addedUsers = newUsers.difference(oldUsers)
 
-            # create a randomized layout for the game board
+            # add some new fields to new users' records
             for addedUser in addedUsers:
-                board = range(25)
+                newFields = {
+                    "rightGuesses": 0,
+                    "wrongGuesses": 0
+                }
+
+                # create a randomized layout for the game board
+                board = game["tracks"].keys()
                 random.shuffle(board)
-                userData["users"][addedUser]["board"] = board
+                newFields["board"] = board
+
+                # update user record with new fields
+                userData["users"][addedUser].update(newFields)
 
             game["users"] = userData["users"]
             if len(game["users"]) == 0:
@@ -147,10 +155,28 @@ class game:
         if "playState" in userData:
             game["playState"] = userData["playState"]
             if userData["playState"]:
-                game["playingTrack"] = random.choice(game["toGuess"])
+                toGuess = filter(lambda t: not bool(t[1]["guessedBy"]), game["tracks"].iteritems())
+                game["playingTrack"] = random.choice([k for k, v in toGuess])
             else:
                 game["playingTrack"] = None
 
+        if "guess" in userData:
+            guess = userData["guess"]
+            guessedTrackId = guess["trackId"]
+            userId = guess["userId"]
+            user = game["users"][userId]
+            playState = game["playState"]
+            playingTrackId = game["playingTrack"]
+
+            if playingTrackId is not None and playState:
+                # user guessed correctly
+                if guessedTrackId == playingTrackId:
+                    user["rightGuesses"] += 1
+                    game["tracks"][guessedTrackId]["guessedBy"] = userId
+
+                # user guessed incorrectly
+                else:
+                    user["wrongGuesses"] += 1
 
         return resp("200", "Ok", game)
 

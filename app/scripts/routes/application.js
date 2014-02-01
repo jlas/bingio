@@ -39,7 +39,7 @@ define([
             var ViewCls = routeViews[route];
             var view = new ViewCls(options);
             view.render();
-            $("body").html(view.$el);
+            $("#app").html(view.$el);
             this.currentView = view;
         }
     });

@@ -10,7 +10,7 @@
           var track = rows[i][j];
       %>
 
-      <td id="<%= track.key %>">
+      <td class="game-square" id="<%= track.key %>">
         <p class="track-name"><%= track.name %></p>
         <p class="track-artist"><%= track.artist %></p>
       </td>
@@ -36,7 +36,25 @@
         <a href="http://www.rdio.com<%= user.url %>">
           <img src="<%= user.icon %>" alt="icon"/>
         </a>
-        <p><%= user.name %></p>
+        <p>
+          <%= user.name %>
+          <% if (user.rightGuesses > 0) { %>
+          <span class="text-success"><%= user.rightGuesses %></span>
+          <% } %>
+        </p>
+        <%
+          if (user.wrongGuesses > 0) {
+            for (var i = 0; i < 3; i++) {
+              var cssClass = (i < user.wrongGuesses) ? "text-danger" : "text-default";
+        %>
+        <p class="fa-stack fa-lg">
+          <i class="fa fa-times fa-lg fa-stack-1x <%= cssClass %>"></i>
+          <i class="fa fa-square-o fa-stack-2x <%= cssClass %>"></i>
+        </p>
+        <%
+           }
+          }
+         %>
       </li>
       <% }); %>
     </ul>
@@ -52,6 +70,4 @@
         <i class="fa fa-pause"></i>&nbsp;&nbsp;Pause Game</button>
       </div>
   </div>
-
-  <div id="playback"></div>
 </div>
