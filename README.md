@@ -3,7 +3,7 @@ bingio
 
 It's like bingo, except with music. Made with Python & Backbone. Powered by Rdio.
 
-Demo video: //www.youtube.com/embed/R7b08g-noac
+Demo video: http://youtu.be/R7b08g-noac
 
 Copyright
 ---------
