@@ -266,7 +266,7 @@ module.exports = function (grunt) {
                     cwd: '<%= yeoman.app %>',
                     dest: '<%= yeoman.dist %>',
                     src: [
-                        '*.{ico,txt}',
+                        '*.{ico,txt,py}',
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}',
                         'styles/fonts/{,*/}*.*',
@@ -301,6 +301,13 @@ module.exports = function (grunt) {
                         'bower_components/sass-bootstrap/fonts/*.*'
                     ]
                 }
+            }
+        },
+        symlink: {
+            explicit: {
+                cwd: 'dist',
+                src: '.',
+                dest: 'dist/static'
             }
         }
     });
@@ -381,7 +388,8 @@ module.exports = function (grunt) {
         'uglify',
         'copy',
         'rev',
-        'usemin'
+        'usemin',
+        'symlink'
     ]);
 
     grunt.registerTask('default', [

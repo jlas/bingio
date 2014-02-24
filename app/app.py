@@ -22,6 +22,9 @@ from rdioapi import Rdio
 rdiodict = {}
 
 def rdio():
+    """Get the Rdio API object for user based on a UUID cookie
+    @return (obj) rdio api object
+    """
     playerid = web.cookies().get("playerid")
     if not playerid:
         playerid = str(uuid.uuid4().get_hex())
@@ -51,7 +54,10 @@ gameStore = {}
 
 
 class authentication:
+    """OAuth authentication and endpoint for basic user data."""
+
     def GET(self):
+        """Return auth state and basic user data."""
         user = rdio().currentUser(extras='["username"]')
         return json.dumps({
             "state": bool(rdio().authenticated),
@@ -64,10 +70,12 @@ class authentication:
         })
 
     def POST(self):
+        """Start OAuth authentication."""
         url = rdio().begin_authentication(web.ctx.homedomain)
         web.redirect(url)
 
     def DELETE(self):
+        """Logout of Rdio session."""
         rdio().logout()
 
 
@@ -78,34 +86,25 @@ class icon:
 
 
 class game:
+    """Endpoint for a single game resource."""
+
     def GET(self, _id):
+        """Return game resource."""
         return json.dumps(gameStore[_id])
 
-    def PUT(self, _id):
-        userData = json.loads(web.data())
-        name = userData["name"]
-        source = userData["source"]
-        playlist = userData.get("playlist")  # could be optional
-
-        domain = web.ctx.host.split(":")[0]
-        game = {
-            "_id": _id,
-            "name": name,
-            "playbackToken": rdio().getPlaybackToken(domain=domain),
-            "tracks": {},
-            "users": {},
-            "playState": False,
-            "playingTrack": None
-            }
-
+    def _makeTracks(self, source, playlist=None):
         user = rdio().currentUser()
+
+        # get top 100 tracks in collection, sorted by playCount
         if source == "collection":
             tracks = rdio().getTracksInCollection(
                 user=user["key"], sort="playCount", count=100)
 
+        # get top 50 tracks in top charts
         elif source == "charts":
             tracks = rdio().getTopCharts(type="Track", count=50)
 
+        # get tracks in a playlist
         elif source == "playlist" and playlist:
             playlists = rdio().getUserPlaylists(
                 user=user["key"], extras='["tracks"]')
@@ -114,75 +113,150 @@ class game:
                     tracks = pl["tracks"]
                     break
 
+        # if we have more than 25 tracks, pick a random selection of 25
         if len(tracks) > 25:
             random.shuffle(tracks)
             tracks = tracks[:25]
 
+        # create a dict for each track with a subset of rdio data, add our own
+        # "guessedBy" field to track player who guessed track correctly
         trackFields = ["key", "name", "artist", "guessedBy"]
         tracks = [dict([(k, track.get(k, None)) for k in trackFields]) for track in tracks]
-        game["tracks"] = dict([(track["key"], track) for track in tracks])
-        gameStore[_id] = game
+        return dict([(track["key"], track) for track in tracks])
+
+    def _makePlaybackToken(self):
+        """Generate the Rdio playback token."""
+        # get domain name of the server, remove any port number
+        domain = web.ctx.host.split(":")[0]
+        return rdio().getPlaybackToken(domain=domain)
+
+    def _makeResource(self, _id, name, tracks):
+        """Generate a bare dict for the game resource.
+        @param _id (string)
+        @param name (string)
+        @param tracks (dict)
+        """
+        return {
+            # unique id
+            "_id": _id,
+
+            # user provided game name
+            "name": name,
+
+            # rdio-generated token for clientside playback
+            "playbackToken": self._makePlaybackToken(),
+
+            # dict of tracks in game
+            "tracks": tracks,
+
+            # dict of users currently in game
+            "users": {},
+
+            # game state, False = game is paused, True = game is playing
+            "playState": False,
+
+            # current track being played
+            "playingTrackId": None
+        }
+
+
+    def PUT(self, _id):
+        """Create a new game resource."""
+        # get user provided data
+        userData = json.loads(web.data())
+
+        # create track data, playlist is optional
+        tracks = self._makeTracks(userData["source"], userData.get("playlist"))
+
+        # create the resource and add to global dict
+        gameStore[_id] = game = self._makeResource(_id, userData["name"], tracks)
+
         return resp("201", "Created", game)
 
+    def _updateUsers(self, oldUsers, newUsers, trackIds):
+        """Update user records in game
+        @param oldUsers (list)
+        @param newUsers (list)
+        @param trackIds (list)
+        """
+        oldNames = set(oldUsers.keys())
+        newNames = set(newUsers.keys())
+        addedNames = newNames.difference(oldNames)
+        for addedName in addedNames:
+            # create a randomized layout for the new user's game board
+            random.shuffle(trackIds)
+
+            # update user record with new fields
+            newUsers[addedName].update({
+                    # number of correct guesses
+                    "rightGuesses": 0,
+
+                    # number of incorrect guesses
+                    "wrongGuesses": 0,
+
+                    # the user's unique game board
+                    "board": trackIds
+                })
+
+        return newUsers
+
+    def _pickNewTrack(self, tracks):
+        """Select a random track from a list of tracks.
+        @param tracks (dict)
+        @return track id (aka key)
+        """
+        toGuess = filter(lambda t: not bool(t["guessedBy"]), tracks.itervalues())
+        return random.choice([k["key"] for k in toGuess])
+
+    def _handleUserGuess(self, guess, game):
+        """Handle a user guess
+        @param guess (dict) with trackId and userId
+        @param game (dict)
+        @return None (game dict altered in this method)
+        """
+        guessedTrackId = guess["trackId"]
+        userId = guess["userId"]
+        user = game["users"][userId]
+        playingTrackId = game["playingTrackId"]
+
+        if playingTrackId is not None and game["playState"]:
+            alreadyGuessed = bool(game["tracks"][guessedTrackId]["guessedBy"])
+            if not alreadyGuessed:
+                # user guessed correctly
+                if guessedTrackId == playingTrackId:
+                    user["rightGuesses"] += 1
+                    game["tracks"][guessedTrackId]["guessedBy"] = userId
+                    game["playingTrackId"] = self._pickNewTrack(game["tracks"])
+
+                # user guessed incorrectly
+                else:
+                    user["wrongGuesses"] += 1
+
     def PATCH(self, _id):
+        """Update an existing game resource."""
         userData = json.loads(web.data())
         game = gameStore[_id]
 
+        # update users, remove game if # of users is 0
         if "users" in userData:
-            oldUsers = set(game["users"].keys())
-            newUsers = set(userData["users"].keys())
-            addedUsers = newUsers.difference(oldUsers)
+            game["users"] = self._updateUsers(
+                game["users"], userData["users"], game["tracks"].keys())
 
-            # add some new fields to new users' records
-            for addedUser in addedUsers:
-                newFields = {
-                    "rightGuesses": 0,
-                    "wrongGuesses": 0
-                }
-
-                # create a randomized layout for the game board
-                board = game["tracks"].keys()
-                random.shuffle(board)
-                newFields["board"] = board
-
-                # update user record with new fields
-                userData["users"][addedUser].update(newFields)
-
-            game["users"] = userData["users"]
             if len(game["users"]) == 0:
                 del gameStore[_id]
 
-        def pickNewTrack(game):
-            toGuess = filter(lambda t: not bool(t[1]["guessedBy"]), game["tracks"].iteritems())
-            game["playingTrack"] = random.choice([k for k, v in toGuess])
-
+        # update the play state (paused vs. playing)
         if "playState" in userData:
             game["playState"] = userData["playState"]
             if userData["playState"]:
-                pickNewTrack(game)
+                game["playingTrackId"] = self._pickNewTrack(game["tracks"])
             else:
-                game["playingTrack"] = None
+                game["playingTrackId"] = None
 
+        # handle user guess
         if "guess" in userData:
             guess = userData["guess"]
-            guessedTrackId = guess["trackId"]
-            userId = guess["userId"]
-            user = game["users"][userId]
-            playState = game["playState"]
-            playingTrackId = game["playingTrack"]
-
-            if playingTrackId is not None and playState:
-                alreadyGuessed = bool(game["tracks"][guessedTrackId]["guessedBy"])
-                if not alreadyGuessed:
-                    # user guessed correctly
-                    if guessedTrackId == playingTrackId:
-                        user["rightGuesses"] += 1
-                        game["tracks"][guessedTrackId]["guessedBy"] = userId
-                        pickNewTrack(game)
-
-                    # user guessed incorrectly
-                    else:
-                        user["wrongGuesses"] += 1
+            self._handleUserGuess(guess, game)
 
         return resp("200", "Ok", game)
 
@@ -219,10 +293,8 @@ class default:
 class debug:
     def GET(self):
         print web.ctx.status
-
         # url = rdio().begin_authentication(web.ctx.host)
         # web.redirect(url)
-
         #return web.ctx.host
         #return web.url()
 

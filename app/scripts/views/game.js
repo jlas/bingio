@@ -23,7 +23,7 @@ define([
         var oldPlayingTrack = null;
         var playbackToken = game.get("playbackToken");
         function monitorPlayingTrack() {
-            var newPlayingTrack = game.get("playingTrack");
+            var newPlayingTrack = game.get("playingTrackId");
             if (oldPlayingTrack !== newPlayingTrack) {
                 if (newPlayingTrack === null) {
                     $('#playback').rdio().stop();
