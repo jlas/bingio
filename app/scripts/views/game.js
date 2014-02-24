@@ -45,6 +45,7 @@ define([
 
         events: {
             "click #quit-game-btn": "quitGame",
+            "click #game-over-btn": "quitGame",
             "click #start-game-btn": "toggleState",
             "click #pause-game-btn": "toggleState",
             "click .game-square": "guessTrack"
@@ -93,10 +94,20 @@ define([
                 toggleStateButtons();
             }
 
+            if (this.game.get("winner") !== null) {
+                // display winner modal, disable keyboard ESC
+                $("#winner-modal").modal({keyboard: false});
+            }
+
             return this;
         },
 
         quitGame: function() {
+            // hide the winner modal if it's visible
+            if ($("#winner-modal:visible").length != 0) {
+                $("#winner-modal").modal("hide");
+            }
+
             Cookies.expire("game");
             this.game.removePlayer(this.curUser["id"], function() {
                     Backbone.history.navigate('lobby', {

@@ -156,7 +156,10 @@ class game:
             "playState": False,
 
             # current track being played
-            "playingTrackId": None
+            "playingTrackId": None,
+
+            # winner
+            "winner": None
         }
 
 
@@ -194,6 +197,9 @@ class game:
                     # number of incorrect guesses
                     "wrongGuesses": 0,
 
+                    # correctly guessed tracks (as indices in the board array)
+                    "rightIndices": [],
+
                     # the user's unique game board
                     "board": trackIds
                 })
@@ -208,6 +214,28 @@ class game:
         toGuess = filter(lambda t: not bool(t["guessedBy"]), tracks.itervalues())
         return random.choice([k["key"] for k in toGuess])
 
+    def _isWinningBoard(self, indices):
+        """Check if a set of board indices form a winning bingo board.
+        @indices (list) a list of row-major board indices, i.e. 0-4 are
+          indices in the first row, 5-6 are indices in the second row, etc.
+        """
+        # need at least 5 indices to have a winning board
+        if len(indices) < 5:
+            return False
+
+        # generate ranges
+        rows = [range(i, i + 5) for i in xrange(0, 21, 5)]
+        cols = [range(i, i + 21, 5) for i in xrange(5)]
+        diags = [[0, 6, 12, 18, 24], [20, 16, 12, 8, 4]]
+
+        # check ranges
+        for rng in rows + cols + diags:
+            for idx in rng:
+                if not idx in indices:
+                    break
+            else:
+                return True
+
     def _handleUserGuess(self, guess, game):
         """Handle a user guess
         @param guess (dict) with trackId and userId
@@ -219,18 +247,28 @@ class game:
         user = game["users"][userId]
         playingTrackId = game["playingTrackId"]
 
-        if playingTrackId is not None and game["playState"]:
-            alreadyGuessed = bool(game["tracks"][guessedTrackId]["guessedBy"])
-            if not alreadyGuessed:
-                # user guessed correctly
-                if guessedTrackId == playingTrackId:
-                    user["rightGuesses"] += 1
-                    game["tracks"][guessedTrackId]["guessedBy"] = userId
-                    game["playingTrackId"] = self._pickNewTrack(game["tracks"])
+        # user already lost, too many wrong guesses
+        if user["wrongGuesses"] >= 3:
+            return
 
-                # user guessed incorrectly
-                else:
-                    user["wrongGuesses"] += 1
+        # game is not being played
+        if not game["playState"] or playingTrackId is None:
+            return
+
+        alreadyGuessed = bool(game["tracks"][guessedTrackId]["guessedBy"])
+        if not alreadyGuessed:
+            # user guessed correctly
+            if guessedTrackId == playingTrackId:
+                user["rightGuesses"] += 1
+                user["rightIndices"].append(user["board"].index(guessedTrackId))
+                game["tracks"][guessedTrackId]["guessedBy"] = userId
+                game["playingTrackId"] = self._pickNewTrack(game["tracks"])
+                if self._isWinningBoard(user["rightIndices"]):
+                    game["winner"] = userId
+
+            # user guessed incorrectly
+            else:
+                user["wrongGuesses"] += 1
 
     def PATCH(self, _id):
         """Update an existing game resource."""
