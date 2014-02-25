@@ -34,6 +34,16 @@
 <!-- Users area -->
 <div class="container">
   <div class="row">
+    <div class="text-center">
+      <button id="quit-game-btn" class="btn btn-default btn-lg" type="button">
+        <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Quit Game</button>
+      <button id="start-game-btn" class="btn btn-default btn-lg" type="button">
+        <i class="fa fa-play"></i></i>&nbsp;&nbsp;Start Game</button>
+      <button id="pause-game-btn" class="btn btn-default btn-lg" type="button" style="display:none">
+        <i class="fa fa-pause"></i>&nbsp;&nbsp;Pause Game</button>
+      </div>
+  </div>
+  <div class="row">
     <ul id="users">
       <%
         var users = this.game.get("users") || {};
@@ -70,17 +80,6 @@
       </li>
       <% }); %>
     </ul>
-  </div>
-
-  <div class="row">
-    <div class="text-center">
-      <button id="quit-game-btn" class="btn btn-default btn-lg" type="button">
-        <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Quit Game</button>
-      <button id="start-game-btn" class="btn btn-default btn-lg" type="button">
-        <i class="fa fa-play"></i></i>&nbsp;&nbsp;Start Game</button>
-      <button id="pause-game-btn" class="btn btn-default btn-lg" type="button" style="display:none">
-        <i class="fa fa-pause"></i>&nbsp;&nbsp;Pause Game</button>
-      </div>
   </div>
 </div>
 

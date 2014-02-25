@@ -27,7 +27,6 @@ define([
 
             // unset the current view and set a new one
             if (this.currentView !== undefined) {
-                console.log("cleanup!");
                 this.currentView.remove();
                 this.currentView.unbind();
 

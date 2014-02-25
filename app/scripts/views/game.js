@@ -72,10 +72,8 @@ define([
 
         render: function() {
             if (this.game === undefined || this.game.get("playState") === undefined) {
-                console.log("dont render");
                 return this;
             }
-            console.log("render");
 
             var board = this.game.get("users")[this.curUser["id"]]["board"];
             var tracks = this.game.get("tracks");
