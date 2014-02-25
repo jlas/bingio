@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+## Push to Heroku
+##
+## Because Heroku doesn't clearly support Python / Node hybrid projects I've
+## hacked together this script to facilitate deploying to Heroku. The idea is
+## to build everything Node is needed for locally, commit the build artifacts,
+## and push that to Heroku. This way all we need from Heroku is a Python
+## runtime.
+##
+## So the way it works is we clone our upstream (e.g. the GitHub origin repo)
+## into a scratch temp directory on our system. Then build the node artificats,
+## i.e. using npm, grunt, bower, etc. Then we commit those artifacts using git
+## and push to Heroku. We don't push to origin (probably GitHub) because we
+## don't want to version control the build artifacts. We delete the scratch
+## repo when we're done.
+
 function choice {
     CHOICE=''
     local prompt="$*"
