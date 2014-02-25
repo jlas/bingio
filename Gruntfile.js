@@ -166,6 +166,7 @@ module.exports = function (grunt) {
         compass: {
             options: {
                 sassDir: '<%= yeoman.app %>/styles',
+                specify: '<%= yeoman.app %>/styles/main.scss',
                 cssDir: '<%= yeoman.tmp %>/styles',
                 imagesDir: '<%= yeoman.app %>/images',
                 javascriptsDir: '<%= yeoman.app %>/scripts',
@@ -269,9 +270,20 @@ module.exports = function (grunt) {
                         '*.{ico,txt}',
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}',
-                        'styles/fonts/{,*/}*.*',
-                        'bower_components/sass-bootstrap/fonts/*.*'
+                        'styles/fonts/{,*/}*.*'
                     ]
+                }, {
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.app %>/bower_components/font-awesome/fonts',
+                    src: ['*.*'],
+                    dest: '<%= yeoman.dist %>/fonts'
+                }, {
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.app %>/bower_components/sass-bootstrap/fonts',
+                    src: ['*.*'],
+                    dest: '<%= yeoman.dist %>/fonts'
                 }]
             }
         },
@@ -305,9 +317,9 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('createDefaultTemplate', function () {
-        grunt.file.write('.tmp/scripts/templates.js', 'this.JST = this.JST || {};');
-    });
+    // grunt.registerTask('createDefaultTemplate', function () {
+    //     grunt.file.write('.tmp/scripts/templates.js', 'this.JST = this.JST || {};');
+    // });
 
     grunt.registerTask('server', function () {
         grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
@@ -376,8 +388,8 @@ module.exports = function (grunt) {
         'requirejs',
         'imagemin',
         'htmlmin',
-        'concat',
         'cssmin',
+        'concat',
         'uglify',
         'copy',
         'rev',
