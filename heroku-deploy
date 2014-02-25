@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+function choice {
+    CHOICE=''
+    local prompt="$*"
+    local answer
+    read -p "$prompt" answer
+    case "$answer" in
+        [yY1] ) CHOICE='y';;
+        [nN0] ) CHOICE='n';;
+        *     ) CHOICE='n';;
+    esac
+}
+
+echo "Push to Heroku?"
+echo "We'll clone a scratch copy of this repo and alter it in a temp directory."
+echo "After pushing to Heroku the scratch copy will be removed."
+echo
+choice "Is this okay? [y/N] "
+
+if [[ "$CHOICE" == "y" ]]; then
+    # use a temp repo so our alterations don't get reused
+    tmpdir=$(mktemp -d -t bingio)
+
+    # find upstream git repo url
+    upsteam=$(git remote show origin | grep -o -m1 "https://.*$")
+
+    # clone repo and push into it
+    git clone $upstream $tmpdir
+    pushd $tmpdir
+
+    # run make-prod
+    ./make-prod
+
+    # need to remove package.json so Heroku doesn't assume node.js app
+    git rm package.json
+
+    # pick a sed binary
+    type gsed && sedbin=gsed || sedbin=sed
+
+    # remove dist/ from .gitignore and add it to index
+    $($sedbin --in-place "s/dist//" .gitignore)
+    git add dist/
+
+    git ci -am 'auto-generated heroku release'
+
+    git remote add heroku git@heroku.com:bingio.git
+
+    # need to force because upstream will have different history
+    git push --force heroku master
+
+    # cleanup temp repo
+    popd
+    rm -rf $tmpdir
+fi
