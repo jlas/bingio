@@ -23,7 +23,7 @@ if [[ "$CHOICE" == "y" ]]; then
     tmpdir=$(mktemp -d -t bingio)
 
     # find upstream git repo url
-    upsteam=$(git remote show origin | grep -o -m1 "https://.*$")
+    upstream=$(git remote show origin | grep -o -m1 "https://.*$")
 
     # clone repo and push into it
     git clone $upstream $tmpdir
