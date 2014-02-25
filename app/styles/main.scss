@@ -11,14 +11,18 @@ $red: red;
 $font-family-sans-serif: "Open Sans";
 $btn-default-border: $teal;
 $btn-default-color: $darkteal;
-$link-color: $blue;
-$link-hover-color: $purple;
+$btn-primary-bg: $teal;
+$btn-primary-border: $teal;
+$btn-primary-color: white;
+$link-color: $teal;
+$link-hover-color: $teal;
 /*$text-color: $darkteal;*/
 
+@import 'sass-bootstrap/lib/bootstrap';
 @import 'layout';
 @import 'typography';
 @import 'color';
-@import 'sass-bootstrap/lib/bootstrap';
+
 
 .browsehappy {
     margin: 0.2em 0;

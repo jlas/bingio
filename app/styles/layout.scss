@@ -9,6 +9,8 @@ td {
 	width: 20%;
 }
 
+footer { margin-top: 10px; }
+
 #users {
 	list-style-type: none;
 	margin: 0;
@@ -45,7 +47,36 @@ td {
 	padding: 10px;
 }
 
+#sidebar-games > .row {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 #no-games-msg { margin-top: 1em; }
+
+/* Games header row */
+#sidebar-games > li:first-child {
+	font-weight: bold;
+	color: $darkteal;
+}
+
+#sidebar-games hr {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+/* Add padding and transparent border to match button dimensions */
+#sidebar-games .num-players {
+	padding: $padding-base-vertical 0;
+	border: 1px transparent solid;
+}
+
+#sidebar-games button {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+dd, dt { float: left; }
 
 /* Chat */
 #chat-log {

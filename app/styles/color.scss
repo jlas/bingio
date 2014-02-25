@@ -4,6 +4,7 @@ button { border-color: $teal; }
 
 /* Default Icon color */
 .fa { color: $teal; }
+.fa.text-danger { color: $brand-danger; }
 
 /* Default Icon color */
 #no-games-msg { color: $darkteal; }

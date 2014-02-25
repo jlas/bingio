@@ -79,19 +79,23 @@ define([
         renderGames: function() {
             var $games = this.$el.find("#sidebar-games");
             var gametmpl = _.template(
-                "<li><button class='enter-game btn btn-link' data-game-id='<%= _id %>'>" +
-                "<%= name %></a></li>");
+                "<li class='row'><dt class='col-md-8'>" +
+                "<button class='enter-game btn btn-link' data-game-id='<%= _id %>'>" +
+                "<%= name %></a></dt><dd class='col-md-4'>" +
+                "<div class='num-players'><%= numPlayers %></div></dd></li>");
 
             if (this.gamesCollection.isEmpty()) {
                 $("#no-games-msg").show();
             } else {
-                $games.empty();
+                $games.html("<li class='row'><dt class='col-md-8'>Game Room</dt>" +
+                    "<dd class='col-md-4'>Players</dd></li><hr>");
             }
 
             this.gamesCollection.each(function(entry) {
                 $games.append(gametmpl({
                     "name": entry.get("name"),
-                    "_id": entry.get("_id")
+                    "_id": entry.get("_id"),
+                    "numPlayers": _.keys(entry.get("users")).length
                 }));
             });
         },
