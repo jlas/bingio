@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+## Run this script to set up the "prod" environment. It downloads the node and
+## bower modules required, then runs the Grunt build task. This script was
+## tested on Mac OSX but will likely run on any Unix like system
+
+if ! [[ -e node_modules ]]; then
+	echo "Running 'npm install'"
+	npm install
+fi
+
+if ! [[ -e app/bower_components ]]; then
+	echo "Running 'bower install'"
+	bower install
+fi
+
+grunt build
+
+# This should be in the Gruntfile, but I couldn't figure out how to symlink
+# exactly like this, so I gave up and used this.
+pushd dist
+ln -s . static
+popd
