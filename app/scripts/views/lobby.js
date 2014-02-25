@@ -81,7 +81,13 @@ define([
             var gametmpl = _.template(
                 "<li><button class='enter-game btn btn-link' data-game-id='<%= _id %>'>" +
                 "<%= name %></a></li>");
-            $games.empty();
+
+            if (this.gamesCollection.isEmpty()) {
+                $("#no-games-msg").show();
+            } else {
+                $games.empty();
+            }
+
             this.gamesCollection.each(function(entry) {
                 $games.append(gametmpl({
                     "name": entry.get("name"),

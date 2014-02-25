@@ -1,51 +1,29 @@
-body {
-	background-image: url(/static/img/brushed.png);
-}
+body { background-image: url(/static/img/brushed.png); }
 
-button {
-	border-color: $teal;
-}
+button { border-color: $teal; }
 
-td:hover {
-	outline: 1px solid $teal;
-}
+/* Default Icon color */
+.fa { color: $teal; }
 
-a:hover {
-	text-decoration: none !important;
-}
+/* Default Icon color */
+#no-games-msg { color: $darkteal; }
 
-a.chat-entry-me {
-	color: red;
-}
-a.chat-entry-me:hover {
-	color: darkred;
-}
-a.chat-entry-me:visited {
-	color: red;
-}
+td:hover { outline: 1px solid $teal; }
 
-a.chat-entry-other {
-	color: blue;
-}
-a.chat-entry-other:hover {
-	color: darkblue;
-}
-a.chat-entry-other:visited {
-	color: blue;
-}
+a:hover { text-decoration: none !important; }
 
-.logo {
-    color: $darkteal;
-}
+/* Chat entry for me */
+a.chat-entry-me { color: red; }
+a.chat-entry-me:hover { color: darkred; }
+a.chat-entry-me:visited { color: red; }
 
-.track-artist {
-	color: $purple;
-}
+/* Chat entry for others */
+a.chat-entry-other { color: blue; }
+a.chat-entry-other:hover { color: darkblue; }
+a.chat-entry-other:visited { color: blue; }
 
-.fa {
-	color: $teal;
-}
+.logo { color: $darkteal; }
 
-.guessed {
-	background-color: lightgrey;
-}
+.track-artist { color: $purple; }
+
+.guessed { background-color: lightgrey; }
