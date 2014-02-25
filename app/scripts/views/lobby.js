@@ -37,7 +37,8 @@ define([
             "submit #create-game-form": "createGame",
             "click #create-game-btn": "renderModal",
             "click input[name='source']": "togglePlaylistInput",
-            "click .enter-game": "clickGame"
+            "click .enter-game": "clickGame",
+            "click #how-to-btn": "showHowTo"
         },
 
         initialize: function(options) {
@@ -60,6 +61,10 @@ define([
         render: function() {
             this.$el.html(this.template(this));
             return this;
+        },
+
+        showHowTo: function() {
+            $("#how-to-modal").modal();
         },
 
         renderChat: function() {

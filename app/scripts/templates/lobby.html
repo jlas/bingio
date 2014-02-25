@@ -6,7 +6,15 @@
   -->
 
 <div class="container">
-  <h1 class="logo logo-small">bingio</h1>
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <h1 class="logo logo-small">bingio</h1>
+    </div>
+    <div class="col-md-4 text-right">
+      <button id="how-to-btn" class="btn btn-primary">
+        <i class="fa fa-question-circle"></i>&nbsp;&nbsp;How To Play</button>
+    </div>
+  </div>
   <div class="row">
     <div class="col-md-4" id="sidebar">
       <button id="create-game-btn" class="btn btn-default btn-block">
@@ -93,6 +101,37 @@
           <button type="submit" class="btn btn-primary">Create Game!</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="how-to-modal" tabindex="-1" role="dialog"
+    aria-labelledby="howTo" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">How To Play</h4>
+      </div>
+      <div class="modal-body">
+        <p>Bingio is played with a 5 x 5 game board, similar to Bingo. Each board tile has the name of a song and artist.</p>
+        <p class="text-center">
+          <img src="/static/images/how-to-tile.png" alt="tile"/>
+        </p>
+        <p>Songs will play at random and the player must guess which song is playing by clicking on the appropriate tile.</p>
+        <p>The objective of the game is to correctly guess all 5 songs in a single row, column, or diagonal.</p>
+        <p class="text-center">
+          <img src="/static/images/how-to-win.png" alt="winning"/>
+        </p>
+        <p>The first player to do so is the winner.</p>
+        <p><strong>Note:</strong> each player only has 3 chances to correctly guess tiles. After 3 bad guesses, that player loses the game.</p>
+        <p class="text-center">
+          <img src="/static/images/how-to-losing.png" alt="losing"/>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+      </div>
     </div>
   </div>
 </div>

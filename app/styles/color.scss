@@ -12,6 +12,7 @@ button { border-color: $teal; }
 /* Default Icon color */
 .fa { color: $teal; }
 .fa.text-danger { color: $brand-danger; }
+.btn-primary > .fa { color: white; }
 
 /* Default Icon color */
 #no-games-msg { color: $darkteal; }

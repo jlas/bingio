@@ -18,6 +18,8 @@ td {
 
 footer { margin-top: 10px; }
 
+.modal-footer { margin-top: 0; }
+
 #users {
 	list-style-type: none;
 	margin: 1em 0;
@@ -44,6 +46,8 @@ footer { margin-top: 10px; }
 .logo {
 	text-align: center;
 }
+
+#how-to-btn { border-radius: 0; }
 
 /* Games Sidebar */
 #sidebar-games {
