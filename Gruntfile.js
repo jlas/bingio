@@ -322,40 +322,40 @@ module.exports = function (grunt) {
     //     grunt.file.write('.tmp/scripts/templates.js', 'this.JST = this.JST || {};');
     // });
 
-    grunt.registerTask('server', function () {
-        grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-        grunt.task.run(['serve:' + target]);
-    });
+    // grunt.registerTask('server', function () {
+    //     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
+    //     grunt.task.run(['serve:' + target]);
+    // });
 
-    grunt.registerTask('serve', function (target) {
-        if (target === 'dist') {
-            return grunt.task.run(['build', 'open:server', 'connect:dist:keepalive']);
-        }
+    // grunt.registerTask('serve', function (target) {
+    //     if (target === 'dist') {
+    //         return grunt.task.run(['build', 'open:server', 'connect:dist:keepalive']);
+    //     }
 
-        if (target === 'test') {
-            return grunt.task.run([
-                'clean:server',
-                'coffee',
-                'createDefaultTemplate',
-                'jst',
-                'compass:server',
-                'connect:test',
-                'open:test',
-                'watch:livereload'
-            ]);
-        }
+    //     if (target === 'test') {
+    //         return grunt.task.run([
+    //             'clean:server',
+    //             'coffee',
+    //             'createDefaultTemplate',
+    //             'jst',
+    //             'compass:server',
+    //             'connect:test',
+    //             'open:test',
+    //             'watch:livereload'
+    //         ]);
+    //     }
 
-        grunt.task.run([
-            'clean:server',
-            'coffee:dist',
-            'createDefaultTemplate',
-            'jst',
-            'compass:server',
-            'connect:livereload',
-            'open:server',
-            'watch'
-        ]);
-    });
+    //     grunt.task.run([
+    //         'clean:server',
+    //         'coffee:dist',
+    //         'createDefaultTemplate',
+    //         'jst',
+    //         'compass:server',
+    //         'connect:livereload',
+    //         'open:server',
+    //         'watch'
+    //     ]);
+    // });
 
     grunt.registerTask('test', function (isConnected) {
         isConnected = Boolean(isConnected);

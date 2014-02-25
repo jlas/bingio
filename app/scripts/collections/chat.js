@@ -30,16 +30,16 @@ define([
             function fetchChat() {
                 chatCollection.fetch({
                     reset: true,
-                    data: {"since": chatCollection.chatidx},
+                    data: {'since': chatCollection.chatidx},
                     success: function() {
                         chatCollection.chatidx += chatCollection.length;
                     },
-                    error: function() {
-                        $("error").text(xhr.responseText).show().fadeOut(5000);
+                    error: function(model, xhr) {
+                        $('error').text(xhr.responseText).show().fadeOut(5000);
                     }
                 });
                 CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
-            };
+            }
 
             fetchChat();
         },
@@ -52,9 +52,9 @@ define([
             var chatCollection = this;
 
             chatCollection.create({
-                "userName": userName,
-                "userUrl": userUrl,
-                "msg": msg
+                'userName': userName,
+                'userUrl': userUrl,
+                'msg': msg
             }, {
                 wait: true,
                 success: function() {
@@ -63,8 +63,8 @@ define([
                     chatCollection.stopFetching();
                     chatCollection.startFetching();
                 },
-                error: function(model, xhr, options) {
-                    $("#error").text(xhr.responseText).show().fadeOut(5000);
+                error: function(model, xhr) {
+                    $('#error').text(xhr.responseText).show().fadeOut(5000);
                 }
             });
         }

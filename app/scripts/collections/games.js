@@ -26,12 +26,12 @@ define([
             function fetchGames() {
                 gamesCollection.fetch({
                     reset: true,
-                    error: function() {
-                        $("error").text(xhr.responseText).show().fadeOut(5000);
+                    error: function(model, xhr) {
+                        $('error').text(xhr.responseText).show().fadeOut(5000);
                     }
                 });
                 GAMES_TIMEOUTID = setTimeout(fetchGames, 2000);
-            };
+            }
 
             fetchGames();
         },

@@ -51,12 +51,12 @@ require([
      * backbone. We can bypass this behaviour by setting the data-bypass
      * attribute on the <a> element.
      */
-    $(document).on("click", "a:not([data-bypass])", function(evt) {
+    $(document).on('click', 'a:not([data-bypass])', function(evt) {
         var href = {
-            prop : $(this).prop("href"),
-            attr : $(this).attr("href")
+            prop : $(this).prop('href'),
+            attr : $(this).attr('href')
         };
-        var root = location.protocol + "//" + location.host;
+        var root = location.protocol + '//' + location.host;
 
         if (href.prop && href.prop.slice(0, root.length) === root) {
             evt.preventDefault();

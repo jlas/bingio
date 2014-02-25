@@ -8,25 +8,26 @@
 /*global define*/
 
 define([
-    "models/authentication",
-    "views/game",
-    "views/lobby",
-    "views/splash"
-], function (authModel, GameView, LobbyView, SplashView) {
-    "use strict";
+    'backbone',
+    'models/authentication',
+    'views/game',
+    'views/lobby',
+    'views/splash'
+], function (Backbone, authModel, GameView, LobbyView, SplashView) {
+    'use strict';
 
     var routeViews = {
-        "game": GameView,
-        "lobby": LobbyView,
-        "splash": SplashView
+        'game': GameView,
+        'lobby': LobbyView,
+        'splash': SplashView
     };
 
     var ApplicationRouter = Backbone.Router.extend({
         routes: {
-            "": "splash",
-            "game": "game",
-            "lobby": "lobby",
-            "splash": "splash",
+            '': 'splash',
+            'game': 'game',
+            'lobby': 'lobby',
+            'splash': 'splash',
         },
 
         switchView: function(route, options) {
@@ -45,36 +46,36 @@ define([
             var ViewCls = routeViews[route];
             var view = new ViewCls(options);
             view.render();
-            $("#app").html(view.$el);
+            $('#app').html(view.$el);
             this.currentView = view;
         }
     });
 
     var router = new ApplicationRouter();
 
-    var routeCb = function(route, params) {
-        if (route !== "splash") {
+    var routeCb = function(route) {
+        if (route !== 'splash') {
             /**
              * If user is not auth'ed and tries to get non-splash page, send
              * them to splash.
              */
             authModel.fetch({
                 success: function() {
-                    if (authModel.get("state") === true) {
-                        router.switchView(route, {"curUser": authModel.get("userData")});
+                    if (authModel.get('state') === true) {
+                        router.switchView(route, {'curUser': authModel.get('userData')});
                     } else {
-                        router.switchView("splash");
+                        router.switchView('splash');
                     }
                 },
-                error: function(model, xhr, options) {
-                    router.switchView("splash");
+                error: function() {
+                    router.switchView('splash');
                 }
             });
         } else {
-            router.switchView("splash");
+            router.switchView('splash');
         }
     };
 
-    router.on("route", routeCb);
+    router.on('route', routeCb);
     return router;
 });

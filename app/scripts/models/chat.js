@@ -14,7 +14,7 @@ define([
     'use strict';
 
     var ChatModel = Backbone.Model.extend({
-        idAttribute: "_id",
+        idAttribute: '_id',
         defaults: {}
     });
 

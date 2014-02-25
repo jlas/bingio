@@ -22,15 +22,15 @@ define([
     var PLAY_TIMEOUTID = null;
 
     function toggleStateButtons() {
-        $("#start-game-btn").toggle();
-        $("#pause-game-btn").toggle();
+        $('#start-game-btn').toggle();
+        $('#pause-game-btn').toggle();
     }
 
     function playbackWatcher(game) {
         var oldPlayingTrack = null;
-        var playbackToken = game.get("playbackToken");
+        var playbackToken = game.get('playbackToken');
         function monitorPlayingTrack() {
-            var newPlayingTrack = game.get("playingTrackId");
+            var newPlayingTrack = game.get('playingTrackId');
             if (oldPlayingTrack !== newPlayingTrack) {
                 if (newPlayingTrack === null) {
                     $('#playback').rdio().stop();
@@ -40,7 +40,7 @@ define([
                 }
                 oldPlayingTrack = newPlayingTrack;
             }
-            console.log('new playing track ' + oldPlayingTrack);
+            // console.log('new playing track ' + oldPlayingTrack);
             PLAY_TIMEOUTID = setTimeout(monitorPlayingTrack, 1000);
         }
         $('#playback').rdio(playbackToken);
@@ -51,21 +51,21 @@ define([
         template: _.template(tmpl),
 
         events: {
-            "click #quit-game-btn": "quitGame",
-            "click #game-over-btn": "quitGame",
-            "click #start-game-btn": "toggleState",
-            "click #pause-game-btn": "toggleState",
-            "click .game-square": "guessTrack"
+            'click #quit-game-btn': 'quitGame',
+            'click #game-over-btn': 'quitGame',
+            'click #start-game-btn': 'toggleState',
+            'click #pause-game-btn': 'toggleState',
+            'click .game-square': 'guessTrack'
         },
 
         initialize: function() {
             this.rows = [];
             this.curUser = this.options.curUser;
-            var gameId = Cookies.get("game");
-            this.game = new GameModel({_id: gameId});
-            this.game.on("sync", this.render, view);
-
             var view = this;
+            var gameId = Cookies.get('game');
+            this.game = new GameModel({_id: gameId});
+            this.game.on('sync', this.render, view);
+
             this.game.fetch().done(function () {
                 playbackWatcher(view.game);
                 view.render();
@@ -78,12 +78,12 @@ define([
         },
 
         render: function() {
-            if (this.game === undefined || this.game.get("playState") === undefined) {
+            if (this.game === undefined || this.game.get('playState') === undefined) {
                 return this;
             }
 
-            var board = this.game.get("users")[this.curUser["id"]]["board"];
-            var tracks = this.game.get("tracks");
+            var board = this.game.get('users')[this.curUser.id].board;
+            var tracks = this.game.get('tracks');
             var rows = this.rows;
             var k = 0;
             for (var i = 0; i < 5; i++) {
@@ -95,13 +95,13 @@ define([
 
             this.$el.html(this.template(this));
 
-            if (this.game.get("playState") === true) {
+            if (this.game.get('playState') === true) {
                 toggleStateButtons();
             }
 
-            if (this.game.get("winner") !== null) {
+            if (this.game.get('winner') !== null) {
                 // display winner modal, disable keyboard ESC
-                $("#winner-modal").modal({keyboard: false});
+                $('#winner-modal').modal({keyboard: false});
             }
 
             return this;
@@ -109,16 +109,16 @@ define([
 
         quitGame: function() {
             // hide the winner modal if it's visible
-            if ($("#winner-modal:visible").length != 0) {
-                $("#winner-modal").modal("hide");
+            if ($('#winner-modal:visible').length !== 0) {
+                $('#winner-modal').modal('hide');
             }
 
-            Cookies.expire("game");
-            this.game.removePlayer(this.curUser["id"], function() {
+            Cookies.expire('game');
+            this.game.removePlayer(this.curUser.id, function() {
                     Backbone.history.navigate('lobby', {
                         trigger : true
                     });
-            });
+                });
             Util.doLoading();
         },
 
@@ -130,8 +130,8 @@ define([
 
         guessTrack: function(evt) {
             evt.preventDefault();
-            var trackId = $(evt.currentTarget).attr("id");
-            var userId = this.curUser["id"];
+            var trackId = $(evt.currentTarget).attr('id');
+            var userId = this.curUser.id;
 
             var view = this;
             this.game.guessTrack(userId, trackId, function() {
