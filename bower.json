@@ -1,5 +1,5 @@
 {
-  "name": "bingio2",
+  "name": "bingio",
   "version": "0.0.0",
   "dependencies": {
     "cookies-js": "~0.1.0",
