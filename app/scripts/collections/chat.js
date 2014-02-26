@@ -24,8 +24,8 @@ define([
         initialize: function() {
             this.chatIdx = 0;
 
-            // Keep track of fetching state, this way we can bail mid-fetch
-            // by referencing this variable in the fetchChat timeout callback
+            // Keep track of fetching state. This way we avoid syncing chat
+            // messages during a fetch.
             this.fetching = false;
 
             // Queue up chat messages in an array. We do this because we want
@@ -36,31 +36,25 @@ define([
         },
 
         startFetching: function() {
-            this.fetching = true;
             var chatCollection = this;
-
             function fetchChat() {
-                if (!chatCollection.fetching) {
-                    return;
-                }
+                chatCollection.fetching = true;
                 chatCollection.fetch({
                     reset: true,
-                    data: {'since': chatCollection.chatIdx},
-                    success: function() {
-                        chatCollection.chatIdx += chatCollection.length;
-                        CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
-                    },
-                    error: function(model, xhr) {
-                        $('error').text(xhr.responseText).show().fadeOut(5000);
-                    }
+                    data: {'since': chatCollection.chatIdx}
+                }).done(function() {
+                    chatCollection.chatIdx += chatCollection.length;
+                    CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
+                }).fail(function(xhr) {
+                    $('error').text(xhr.responseText).show().fadeOut(5000);
+                }).always(function() {
+                    chatCollection.fetching = false;
                 });
             }
-
             fetchChat();
         },
 
         stopFetching: function() {
-            this.fetching = false;
             clearTimeout(CHAT_TIMEOUTID);
         },
 
@@ -72,17 +66,21 @@ define([
 
             var chatCollection = this;
             function sendMsgQueue() {
+                // If we are currently mid-fetch, back off on syncing until
+                // fetch is complete.
+                if (chatCollection.fetching) {
+                    SENDQ_TIMEOUTID = setTimeout(sendMsgQueue, 1000);
+                    return;
+                }
+
                 // Add all our queued messages, clear the queue, and sync
                 chatCollection.add(chatCollection.chatMsgQueue);
                 chatCollection.chatMsgQueue = [];
-                chatCollection.sync("create", chatCollection, {
-                    success: function() {
-                        chatCollection.reset();
-                        chatCollection.startFetching();
-                    },
-                    error: function(model, xhr) {
-                        $('#error').text(xhr.responseText).show().fadeOut(5000);
-                    }
+                chatCollection.sync("create", chatCollection).done(function() {
+                    chatCollection.reset();
+                    chatCollection.startFetching();
+                }).fail(function(xhr) {
+                    $('#error').text(xhr.responseText).show().fadeOut(5000);
                 });
             }
 
