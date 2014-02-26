@@ -27,6 +27,12 @@ define([
             // Keep track of fetching state, this way we can bail mid-fetch
             // by referencing this variable in the fetchChat timeout callback
             this.fetching = false;
+
+            // Queue up chat messages in an array. We do this because we want
+            // to add() the messages to the collection at the last possible
+            // moment. This way messages will not be 'reset' by the fetch call
+            // on latent connections.
+            this.chatMsgQueue = [];
         },
 
         startFetching: function() {
@@ -66,6 +72,9 @@ define([
 
             var chatCollection = this;
             function sendMsgQueue() {
+                // Add all our queued messages, clear the queue, and sync
+                chatCollection.add(chatCollection.chatMsgQueue);
+                chatCollection.chatMsgQueue = [];
                 chatCollection.sync("create", chatCollection, {
                     success: function() {
                         chatCollection.reset();
@@ -77,7 +86,7 @@ define([
                 });
             }
 
-            this.add({
+            this.chatMsgQueue.push({
                 'userName': userName,
                 'userUrl': userUrl,
                 'msg': msg

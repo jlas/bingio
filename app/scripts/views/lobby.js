@@ -15,11 +15,12 @@ define([
     'bootstrap',
     'cookies-js',
     'requirejs-text!templates/lobby.html',
+    'requirejs-text!templates/chatMsg.html',
     'collections/chat',
     'collections/games',
     'models/chat',
     'helpers/util'
-], function ($, _, Backbone, Bootstrap, Cookies, tmpl, ChatCollection, GamesCollection, ChatModel, Util) {
+], function ($, _, Backbone, Bootstrap, Cookies, tmpl, chattmpl, ChatCollection, GamesCollection, ChatModel, Util) {
     'use strict';
 
     // uuid generator
@@ -32,10 +33,7 @@ define([
 
     var LobbyView = Backbone.View.extend({
         template: _.template(tmpl),
-        chattmpl: _.template(
-            '<p data-placeholder="<%= placeholder %>"><a class="<%= cssClass %>" ' +
-            'href="http://www.rdio.com<%= userUrl %>"><%= userName %>:</a>' +
-            ' <%= msg %></p>'),
+        chattmpl: _.template(chattmpl),
 
         events: {
             'submit #chat-form': 'sendChat',
