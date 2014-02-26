@@ -14,6 +14,7 @@ define([
 ], function (_, Backbone, ChatModel) {
     'use strict';
 
+    var SENDQ_TIMEOUTID = null;
     var CHAT_TIMEOUTID = null;
 
     var ChatCollection = Backbone.Collection.extend({
@@ -21,7 +22,7 @@ define([
         url: '/chat',
 
         initialize: function() {
-            this.chatidx = 0;
+            this.chatIdx = 0;
         },
 
         startFetching: function() {
@@ -30,9 +31,9 @@ define([
             function fetchChat() {
                 chatCollection.fetch({
                     reset: true,
-                    data: {'since': chatCollection.chatidx},
+                    data: {'since': chatCollection.chatIdx},
                     success: function() {
-                        chatCollection.chatidx += chatCollection.length;
+                        chatCollection.chatIdx += chatCollection.length;
                         CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
                     },
                     error: function(model, xhr) {
@@ -48,25 +49,32 @@ define([
             clearTimeout(CHAT_TIMEOUTID);
         },
 
-        sendMessage: function(userName, userUrl, msg, successFunc) {
-            var chatCollection = this;
+        // Here we queue up chat messages that arrive in quick succession e.g.
+        // < 1s apart. After user backs off for long enough we send the msgs.
+        sendMessage: function(userName, userUrl, msg) {
+            this.stopFetching();
+            clearTimeout(SENDQ_TIMEOUTID);
 
-            chatCollection.create({
+            var chatCollection = this;
+            function sendMsgQueue() {
+                chatCollection.sync("create", chatCollection, {
+                    success: function() {
+                        chatCollection.reset();
+                        chatCollection.startFetching();
+                    },
+                    error: function(model, xhr) {
+                        $('#error').text(xhr.responseText).show().fadeOut(5000);
+                    }
+                });
+            }
+
+            this.add({
                 'userName': userName,
                 'userUrl': userUrl,
                 'msg': msg
-            }, {
-                wait: true,
-                success: function() {
-                    chatCollection.reset();
-                    successFunc();
-                    chatCollection.stopFetching();
-                    chatCollection.startFetching();
-                },
-                error: function(model, xhr) {
-                    $('#error').text(xhr.responseText).show().fadeOut(5000);
-                }
             });
+
+            SENDQ_TIMEOUTID = setTimeout(sendMsgQueue, 1000);
         }
 
     });

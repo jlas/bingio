@@ -323,8 +323,8 @@ class chat:
         return json.dumps(chatlog[since:])
 
     def POST(self):
-        entry = json.loads(web.data())
-        chatlog.append(entry)
+        entries = json.loads(web.data())
+        chatlog.extend(entries)
         return resp("201", "Created")
 
 

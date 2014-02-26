@@ -32,6 +32,10 @@ define([
 
     var LobbyView = Backbone.View.extend({
         template: _.template(tmpl),
+        chattmpl: _.template(
+            '<p data-placeholder="<%= placeholder %>"><a class="<%= cssClass %>" ' +
+            'href="http://www.rdio.com<%= userUrl %>"><%= userName %>:</a>' +
+            ' <%= msg %></p>'),
 
         events: {
             'submit #chat-form': 'sendChat',
@@ -69,11 +73,12 @@ define([
         },
 
         renderChat: function() {
+            // remove temporary placeholder messages from this user
+            $('#chat-log > p[data-placeholder="true"]').remove();
+
+            var chattmpl = this.chattmpl;
             var curUserUrl = this.curUser.url;
             var $chatlog = this.$el.find('#chat-log');
-            var chattmpl = _.template('<p><a class="<%= cssClass %>" ' +
-                'href="http://www.rdio.com<%= userUrl %>"><%= userName %>:</a>' +
-                ' <%= msg %></p>');
             this.chatCollection.each(function(entry) {
                 var isCurUser = (entry.get('userUrl') === curUserUrl);
                 var cssClass = 'chat-entry-other';
@@ -84,7 +89,8 @@ define([
                     'userName': entry.get('userName'),
                     'userUrl': entry.get('userUrl'),
                     'msg': entry.get('msg'),
-                    'cssClass': cssClass
+                    'cssClass': cssClass,
+                    'placeholder': 'false'
                 }));
             });
         },
@@ -119,8 +125,21 @@ define([
             this.chatCollection.sendMessage(
                 this.curUser.name,
                 this.curUser.url,
-                $chatin.val(),
-                function() {$chatin.val('');});
+                $chatin.val());
+
+            // Add placeholder message for recent messages, for better ux.
+            // On the next chat Ajax update we'll clear these and replace
+            // with all the messages from the server.
+            var $chatlog = this.$el.find('#chat-log');
+            $chatlog.prepend(this.chattmpl({
+                'userName': this.curUser.name,
+                'userUrl': this.curUser.url,
+                'msg': $chatin.val(),
+                'cssClass': 'chat-entry-me',
+                'placeholder': 'true'
+            }));
+
+            $chatin.val('');
         },
 
         createGame: function(evt) {
