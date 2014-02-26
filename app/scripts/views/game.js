@@ -19,28 +19,46 @@ define([
 ], function ($, jqueryRdio, _, Backbone, Cookies, tmpl, GameModel, Util) {
     'use strict';
 
-    function isWinnerModalDisplayed() {
-        return ($('#winner-modal:visible').length !== 0
-            || $('.modal-backdrop').length !== 0);
-    }
+    /**
+     * Modal display functions and private variable to track display state.
+     */
+
+    var winnerModalDisplayed = false;
 
     function displayWinnerModal() {
-        if (isWinnerModalDisplayed()) {
+        if (winnerModalDisplayed) {
             return;
         }
+        winnerModalDisplayed = true;
         // display winner modal, disable keyboard ESC
         $('#winner-modal').modal({keyboard: false});
     }
 
     function hideWinnerModal(callback) {
+        if (!winnerModalDisplayed) {
+            callback();
+            return;
+        }
+
         $('#winner-modal').modal('hide');
-        $(window).on('hidden.bs.modal', callback);
+        $(window).on('hidden.bs.modal', function () {
+            winnerModalDisplayed = false;
+            callback();
+        });
     }
+
+    /**
+     * Toggle Play / Pause button state.
+     */
 
     function toggleStateButtons() {
         $('#start-game-btn').toggle();
         $('#pause-game-btn').toggle();
     }
+
+    /**
+     * Rdio web playback function and private variable to track init state.
+     */
 
     var initRdio = false;
     function monitorPlayingTrack(view) {
@@ -95,7 +113,7 @@ define([
         render: function() {
             if (   this.game === undefined
                 || this.game.get('playState') === undefined
-                || isWinnerModalDisplayed()) {
+                || winnerModalDisplayed) {
                 return this;
             }
 
@@ -146,12 +164,8 @@ define([
         },
 
         gameOver: function() {
-            // hide the winner modal if it's visible
-            if (isWinnerModalDisplayed()) {
-                hideWinnerModal(_.bind(this.quitGame, this));
-            } else {
-                this.quitGame();
-            }
+            // hides the winner modal if it's visible
+            hideWinnerModal(_.bind(this.quitGame, this));
         },
 
         toggleState: function() {

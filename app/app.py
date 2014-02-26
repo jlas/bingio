@@ -279,6 +279,9 @@ class game:
 
     def PATCH(self, _id):
         """Update an existing game resource."""
+        if not _id in gameStore:
+            return resp("404", "Not Found")
+
         userData = json.loads(web.data())
         game = gameStore[_id]
 
