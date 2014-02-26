@@ -23,12 +23,20 @@ define([
 
         initialize: function() {
             this.chatIdx = 0;
+
+            // Keep track of fetching state, this way we can bail mid-fetch
+            // by referencing this variable in the fetchChat timeout callback
+            this.fetching = false;
         },
 
         startFetching: function() {
+            this.fetching = true;
             var chatCollection = this;
 
             function fetchChat() {
+                if (!chatCollection.fetching) {
+                    return;
+                }
                 chatCollection.fetch({
                     reset: true,
                     data: {'since': chatCollection.chatIdx},
@@ -46,6 +54,7 @@ define([
         },
 
         stopFetching: function() {
+            this.fetching = false;
             clearTimeout(CHAT_TIMEOUTID);
         },
 
