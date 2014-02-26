@@ -33,12 +33,12 @@ define([
                     data: {'since': chatCollection.chatidx},
                     success: function() {
                         chatCollection.chatidx += chatCollection.length;
+                        CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
                     },
                     error: function(model, xhr) {
                         $('error').text(xhr.responseText).show().fadeOut(5000);
                     }
                 });
-                CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
             }
 
             fetchChat();
