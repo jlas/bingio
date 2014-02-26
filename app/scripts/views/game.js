@@ -19,40 +19,59 @@ define([
 ], function ($, jqueryRdio, _, Backbone, Cookies, tmpl, GameModel, Util) {
     'use strict';
 
-    var PLAY_TIMEOUTID = null;
+    function isWinnerModalDisplayed() {
+        return ($('#winner-modal:visible').length !== 0
+            || $('.modal-backdrop').length !== 0);
+    }
+
+    function displayWinnerModal() {
+        if (isWinnerModalDisplayed()) {
+            return;
+        }
+        // display winner modal, disable keyboard ESC
+        $('#winner-modal').modal({keyboard: false});
+    }
+
+    function hideWinnerModal(callback) {
+        $('#winner-modal').modal('hide');
+        $(window).on('hidden.bs.modal', callback);
+    }
 
     function toggleStateButtons() {
         $('#start-game-btn').toggle();
         $('#pause-game-btn').toggle();
     }
 
-    function playbackWatcher(game) {
-        var oldPlayingTrack = null;
-        var playbackToken = game.get('playbackToken');
-        function monitorPlayingTrack() {
-            var newPlayingTrack = game.get('playingTrackId');
-            if (oldPlayingTrack !== newPlayingTrack) {
-                if (newPlayingTrack === null) {
-                    $('#playback').rdio().stop();
-                } else {
-                    $('#playback').rdio().stop();
-                    $('#playback').rdio().play(newPlayingTrack);
-                }
-                oldPlayingTrack = newPlayingTrack;
-            }
-            // console.log('new playing track ' + oldPlayingTrack);
-            PLAY_TIMEOUTID = setTimeout(monitorPlayingTrack, 1000);
+    var initRdio = false;
+    function monitorPlayingTrack(view) {
+        if (!initRdio) {
+            return;
         }
-        $('#playback').rdio(playbackToken);
-        $('#playback').bind('ready.rdio', monitorPlayingTrack);
+        var newPlayingTrack = view.game.get('playingTrackId');
+        if (view.oldPlayingTrack !== newPlayingTrack) {
+            if (newPlayingTrack === null) {
+                $('#playback').rdio().stop();
+            } else {
+                $('#playback').rdio().stop();
+                $('#playback').rdio().play(newPlayingTrack);
+            }
+            view.oldPlayingTrack = newPlayingTrack;
+        }
+        console.log('new playing track ' + view.oldPlayingTrack);
     }
+
+    // wait for rdio library to load before using the rdio functions
+    $('#playback').bind('ready.rdio', function() {
+        initRdio = true;
+    });
+
 
     var GameView = Backbone.View.extend({
         template: _.template(tmpl),
 
         events: {
             'click #quit-game-btn': 'quitGame',
-            'click #game-over-btn': 'quitGame',
+            'click #game-over-btn': 'gameOver',
             'click #start-game-btn': 'toggleState',
             'click #pause-game-btn': 'toggleState',
             'click .game-square': 'guessTrack'
@@ -60,29 +79,33 @@ define([
 
         initialize: function() {
             this.rows = [];
+            this.oldPlayingTrack = null;
             this.curUser = this.options.curUser;
-            var view = this;
             var gameId = Cookies.get('game');
             this.game = new GameModel({_id: gameId});
-            this.game.on('sync', this.render, view);
-
-            this.game.fetch().done(function () {
-                playbackWatcher(view.game);
-                view.render();
-            });
+            this.game.on('sync', this.render, this);
+            this.game.startFetching();
         },
 
         cleanUp: function() {
+            this.game.stopFetching();
             $('#playback').rdio().stop();
-            clearTimeout(PLAY_TIMEOUTID);
         },
 
         render: function() {
-            if (this.game === undefined || this.game.get('playState') === undefined) {
+            if (   this.game === undefined
+                || this.game.get('playState') === undefined
+                || isWinnerModalDisplayed()) {
                 return this;
             }
 
-            var board = this.game.get('users')[this.curUser.id].board;
+            var user = this.game.get('users')[this.curUser.id];
+            if (user === undefined) {
+                return this;
+            }
+
+            // Create a 2D array for the game board
+            var board = user.board;
             var tracks = this.game.get('tracks');
             var rows = this.rows;
             var k = 0;
@@ -100,19 +123,19 @@ define([
             }
 
             if (this.game.get('winner') !== null) {
-                // display winner modal, disable keyboard ESC
-                $('#winner-modal').modal({keyboard: false});
+                displayWinnerModal();
             }
+
+            // On subsequent calls rdio init function returns early,
+            // so don't worry about performance. This must be called
+            // before 'ready.rdio' is fired.
+            $('#playback').rdio(this.game.get('playbackToken'));
+            monitorPlayingTrack(this);
 
             return this;
         },
 
         quitGame: function() {
-            // hide the winner modal if it's visible
-            if ($('#winner-modal:visible').length !== 0) {
-                $('#winner-modal').modal('hide');
-            }
-
             Cookies.expire('game');
             this.game.removePlayer(this.curUser.id, function() {
                     Backbone.history.navigate('lobby', {
@@ -120,6 +143,15 @@ define([
                     });
                 });
             Util.doLoading();
+        },
+
+        gameOver: function() {
+            // hide the winner modal if it's visible
+            if (isWinnerModalDisplayed()) {
+                hideWinnerModal(_.bind(this.quitGame, this));
+            } else {
+                this.quitGame();
+            }
         },
 
         toggleState: function() {

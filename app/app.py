@@ -95,7 +95,9 @@ class game:
 
     def GET(self, _id):
         """Return game resource."""
-        return json.dumps(gameStore[_id])
+        if not _id in gameStore:
+            return resp("404", "Not Found")
+        return resp("200", "Ok", gameStore[_id])
 
     def _makeTracks(self, source, playlist=None):
         user = rdio().currentUser()

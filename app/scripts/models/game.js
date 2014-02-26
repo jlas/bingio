@@ -13,6 +13,8 @@ define([
 ], function (_, Backbone) {
     'use strict';
 
+    var GAME_TIMEOUTID = null;
+
     var GameModel = Backbone.Model.extend({
         idAttribute: '_id',
         urlRoot: '/games',
@@ -40,6 +42,26 @@ define([
         guessTrack: function(userId, trackId, successCb) {
             var guess = {'trackId': trackId, 'userId': userId};
             this.save({'guess':guess}, {patch: true}).done(successCb);
+        },
+
+        startFetching: function() {
+            var game = this;
+
+            function fetchGame() {
+                game.fetch({
+                    reset: true,
+                    error: function(model, xhr) {
+                        $('error').text(xhr.responseText).show().fadeOut(5000);
+                    }
+                });
+                GAME_TIMEOUTID = setTimeout(fetchGame, 2000);
+            }
+
+            fetchGame();
+        },
+
+        stopFetching: function() {
+            clearTimeout(GAME_TIMEOUTID);
         }
     });
 
