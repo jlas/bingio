@@ -418,8 +418,8 @@ class chat:
 
 class default:
     def GET(self):
-        if rdio().authenticating:
-            userData = web.input()
+        userData = web.input()
+        if rdio().authenticating and ("oauth_verifier" in userData):
             rdio().complete_authentication(userData["oauth_verifier"])
             web.seeother("static/index.html#lobby")
         else:
