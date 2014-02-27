@@ -204,6 +204,11 @@ define([
         },
 
         renderModal: function() {
+            // Check if we can create any more games right now
+            if (this.gamesCollection.isMaxGames()) {
+                Util.doError("Cannot create any more game rooms.");
+                return;
+            }
             $('#create-game-modal').modal();
         },
 

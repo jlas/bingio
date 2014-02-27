@@ -14,11 +14,16 @@ define([
 ], function (_, Backbone, GameModel) {
     'use strict';
 
+    var MAX_GAMES = 500;  // Max number of creatable games
     var GAMES_TIMEOUTID = null;
 
     var GamesCollection = Backbone.Collection.extend({
         model: GameModel,
         url: '/games',
+
+        isMaxGames: function() {
+            return (this.length >= MAX_GAMES);
+        },
 
         startFetching: function() {
             var gamesCollection = this;
