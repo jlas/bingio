@@ -8,8 +8,9 @@
 /*global define*/
 
 define([
-    'jquery'
-], function ($) {
+    'jquery',
+    'underscore'
+], function ($, _) {
     'use strict';
 
     var that = {};
@@ -27,6 +28,14 @@ define([
         $('#app').html(
             '<p id="loading"><i class="fa fa-spinner fa-spin"></i>&nbsp;Loading...</p>');
     };
+
+    // Display an error message
+    that.doError = function(msg) {
+        $('#error').text(msg).show();
+        _.delay(function(){
+            $("#error").fadeOut(2000);
+        }, 4000);
+    }
 
     return that;
 });

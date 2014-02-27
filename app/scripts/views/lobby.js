@@ -172,7 +172,7 @@ define([
                     });
                 },
                 error: function(model, xhr) {
-                    $('#error').text(xhr.responseText).show().fadeOut(5000);
+                    Util.doError(xhr.responseText);
                 }
             });
 
@@ -183,6 +183,10 @@ define([
         },
 
         enterGame: function(game) {
+            if (game.isFull()) {
+                Util.doError("Game room is full.");
+                return;
+            }
             game.addPlayer(this.curUser, function() {
                 Cookies.set('game', game.get('_id'));
                 Backbone.history.navigate('game', {

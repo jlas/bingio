@@ -11,6 +11,16 @@ body {
 	background-position: center 350px;
 }
 
+#error-container {
+	width: 100%;
+	position: absolute;
+	top: 20px;
+	display: inline-flex;
+	justify-content: center;
+}
+
+#error { padding: 20px 40px; }
+
 img[alt="icon"] {
 	border-radius: 50%;
 	height: 100px;

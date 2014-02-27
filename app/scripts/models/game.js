@@ -13,12 +13,17 @@ define([
 ], function (_, Backbone) {
     'use strict';
 
+    var MAX_USERS = 6;  // max users allowed in a game
     var GAME_TIMEOUTID = null;
 
     var GameModel = Backbone.Model.extend({
         idAttribute: '_id',
         urlRoot: '/games',
         defaults: {},
+
+        isFull: function() {
+            return _.keys(this.get("users")).length >= MAX_USERS;
+        },
 
         addPlayer: function(curUser, successCb) {
             var users = this.get('users');

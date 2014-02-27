@@ -10,8 +10,9 @@
 define([
     'underscore',
     'backbone',
-    'models/chat'
-], function (_, Backbone, ChatModel) {
+    'models/chat',
+    'helpers/util'
+], function (_, Backbone, ChatModel, Util) {
     'use strict';
 
     var SENDQ_TIMEOUTID = null;
@@ -58,7 +59,7 @@ define([
                     }
 
                 }).fail(function(xhr) {
-                    $('error').text(xhr.responseText).show().fadeOut(5000);
+                    Util.doError(xhr.responseText);
                 }).always(function() {
                     console.log('fetched');
                     chatCollection.fetching = false;
