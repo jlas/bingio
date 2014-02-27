@@ -51,13 +51,14 @@ footer { margin-top: 10px; }
 	margin: 0 20px 0 20px;
 }
 
-#splash-form > p:first-child { margin-top: 40px; }
+#splash-form > p:first-child { margin-top: 30px; }
 #splash-form p { text-align: center; }
-#splash-form input { margin-top: 20px; }
+#splash-form input { margin: 10px 0 20px 0; }
 #splash-form img {
 	position: relative;
 	top: -3px;
 }
+#splash-form > p > iframe { border: 1px black solid; }
 
 .logo {
 	text-align: center;
