@@ -54,6 +54,7 @@ define([
     function toggleStateButtons() {
         $('#start-game-btn').toggle();
         $('#pause-game-btn').toggle();
+        $('#playing-status').toggle();
     }
 
     /**
