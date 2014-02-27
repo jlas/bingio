@@ -60,6 +60,7 @@ define([
                 }).fail(function(xhr) {
                     $('error').text(xhr.responseText).show().fadeOut(5000);
                 }).always(function() {
+                    console.log('fetched');
                     chatCollection.fetching = false;
                     CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
                 });
@@ -94,6 +95,7 @@ define([
                 }).fail(function(xhr) {
                     $('#error').text(xhr.responseText).show().fadeOut(5000);
                 }).always(function() {
+                    console.log('sent');
                     chatCollection.startFetching();
                 });
             }
