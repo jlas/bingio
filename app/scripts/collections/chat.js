@@ -74,13 +74,14 @@ define([
                 }
 
                 // Add all our queued messages, clear the queue, and sync
-                chatCollection.add(chatCollection.chatMsgQueue);
+                chatCollection.reset(chatCollection.chatMsgQueue);
                 chatCollection.chatMsgQueue = [];
                 chatCollection.sync("create", chatCollection).done(function() {
                     chatCollection.reset();
-                    chatCollection.startFetching();
                 }).fail(function(xhr) {
                     $('#error').text(xhr.responseText).show().fadeOut(5000);
+                }).always(function() {
+                    chatCollection.startFetching();
                 });
             }
 
