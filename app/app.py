@@ -166,6 +166,9 @@ class game:
             # dict of users currently in game
             "users": {},
 
+            #dict of users who came in but left
+            "absentUsers": {},
+
             # game state, False = game is paused, True = game is playing
             "playState": False,
 
@@ -190,33 +193,47 @@ class game:
 
         return resp("201", "Created", game)
 
-    def _updateUsers(self, oldUsers, newUsers, trackIds):
+    def _updateUsers(self, oldUsers, newUsers, absentUsers, trackIds):
         """Update user records in game
         @param oldUsers (list)
         @param newUsers (list)
         @param trackIds (list)
         """
-        oldNames = set(oldUsers.keys())
-        newNames = set(newUsers.keys())
-        addedNames = newNames.difference(oldNames)
-        for addedName in addedNames:
-            # create a randomized layout for the new user's game board
-            random.shuffle(trackIds)
+        oldIds = set(oldUsers.keys())
+        newIds = set(newUsers.keys())
 
-            # update user record with new fields
-            newUsers[addedName].update({
-                    # number of correct guesses
-                    "rightGuesses": 0,
+        # Remember users who left in case they come back later
+        removedIds = oldIds.difference(newIds)
+        for removedId in removedIds:
+            absentUsers[removedId] = oldUsers[removedId]
 
-                    # number of incorrect guesses
-                    "wrongGuesses": 0,
+        # Process new users
+        addedIds = newIds.difference(oldIds)
+        for addedId in addedIds:
+            # User was in this game before, look up old data
+            if addedId in absentUsers:
+                newUsers[addedId].update(absentUsers[addedId])
+                del absentUsers[addedId]
 
-                    # correctly guessed tracks (as indices in the board array)
-                    "rightIndices": [],
+            # User is brand new, create new slots for data
+            else:
+                # Create a randomized layout for the new user's game board
+                random.shuffle(trackIds)
 
-                    # the user's unique game board
-                    "board": trackIds
-                })
+                # Update user record with new fields
+                newUsers[addedId].update({
+                        # number of correct guesses
+                        "rightGuesses": 0,
+
+                        # number of incorrect guesses
+                        "wrongGuesses": 0,
+
+                        # correctly guessed tracks (as indices in the board array)
+                        "rightIndices": [],
+
+                        # the user's unique game board
+                        "board": trackIds
+                    })
 
         return newUsers
 
@@ -315,7 +332,8 @@ class game:
         # update users, remove game if # of users is 0
         if "users" in userData:
             game["users"] = self._updateUsers(
-                game["users"], userData["users"], game["tracks"].keys())
+                game["users"], userData["users"],
+                game["absentUsers"], game["tracks"].keys())
 
             if len(game["users"]) == 0:
                 del gameStore[_id]
