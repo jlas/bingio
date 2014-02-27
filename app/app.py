@@ -3,13 +3,15 @@
 ##  This file is part of Bingio. Bingio is free software under the terms of the
 ##  GNU General Public License version 3, see <http://www.gnu.org/licenses/>.
 
+from collections import Counter
+import json
 import os
 from os.path import dirname
-import json
-import sys
-import web
 import random
+import sys
 import uuid
+
+import web
 
 CHAT_MSG_LEN = 400  # chat message length limit
 CHAT_MAX_MSGS = 100  # total messages to store
@@ -224,6 +226,8 @@ class game:
         @return track id (aka key)
         """
         toGuess = filter(lambda t: not bool(t["guessedBy"]), tracks.itervalues())
+        if not toGuess:
+            return None  # ran out of tracks
         return random.choice([k["key"] for k in toGuess])
 
     def _isWinningBoard(self, indices):
@@ -247,6 +251,16 @@ class game:
                     break
             else:
                 return True
+
+    def _userWithMostCorrect(self, tracks):
+        """Find the user with the most correctly guessed tracks.
+        @param tracks (dict)
+        @return (str) user id
+        """
+        guessedBy = map(lambda track: track["guessedBy"], tracks.values())
+        counter = Counter(guessedBy)
+        # most_common returns [('value', occurances)]
+        return counter.most_common(1)[0][0]
 
     def _handleUserGuess(self, guess, game):
         """Handle a user guess
@@ -274,9 +288,17 @@ class game:
                 user["rightGuesses"] += 1
                 user["rightIndices"].append(user["board"].index(guessedTrackId))
                 game["tracks"][guessedTrackId]["guessedBy"] = userId
-                game["playingTrackId"] = self._pickNewTrack(game["tracks"])
+
+                # check if this user won by completing a line
                 if self._isWinningBoard(user["rightIndices"]):
                     game["winner"] = userId
+
+                newTrack = self._pickNewTrack(game["tracks"])
+                game["playingTrackId"] = newTrack
+
+                # no tracks left, check for player with most right guesses
+                if newTrack is None:
+                    game["winner"] = self._userWithMostCorrect(game["tracks"])
 
             # user guessed incorrectly
             else:
