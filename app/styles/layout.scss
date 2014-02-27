@@ -5,6 +5,12 @@
   GNU General Public License version 3, see <http://www.gnu.org/licenses/>.
 */
 
+body {
+	background-image: url(/static/images/bg-flame.png);
+	background-repeat: no-repeat;
+	background-position: center 350px;
+}
+
 img[alt="icon"] {
 	border-radius: 50%;
 	height: 100px;
@@ -120,3 +126,5 @@ $x-symbol-align: -95px;
 
 /* checkmark symbol for guessed squares */
 .guessed > .fa-check { float: right }
+
+.user-name { border-radius: 1em; }

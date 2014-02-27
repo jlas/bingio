@@ -7,13 +7,14 @@
 
 button { border-color: $teal; }
 
+.well, .user-name { background-color: hsla(0, 0%, 100%, 0.8); }
+
 /* Default Icon color */
 .fa { color: $teal; }
 .fa.text-danger { color: $brand-danger; }
 .fa.text-default { color: $darkteal; }
 .btn-primary > .fa { color: white; }
 
-/* Default Icon color */
 #no-games-msg { color: $darkteal; }
 
 td:hover { outline: 1px solid $teal; }
