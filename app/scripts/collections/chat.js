@@ -43,12 +43,25 @@ define([
                     reset: true,
                     data: {'since': chatCollection.chatIdx}
                 }).done(function() {
-                    chatCollection.chatIdx += chatCollection.length;
-                    CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
+                    // The server adds an 'idx' field to chat msg entries so
+                    // we can keep track what msg index is latest. Here we find
+                    // the highest idx & store the next idx to retrieve from.
+                    var newChatIdx = -1;
+                    chatCollection.each(function(entry) {
+                        if (entry.get('idx') > newChatIdx) {
+                            newChatIdx = entry.get('idx');
+                        }
+                    });
+
+                    if (newChatIdx > -1) {
+                        chatCollection.chatIdx = newChatIdx + 1;
+                    }
+
                 }).fail(function(xhr) {
                     $('error').text(xhr.responseText).show().fadeOut(5000);
                 }).always(function() {
                     chatCollection.fetching = false;
+                    CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
                 });
             }
             fetchChat();

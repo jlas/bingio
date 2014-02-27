@@ -11,6 +11,11 @@ import web
 import random
 import uuid
 
+CHAT_MSG_LEN = 400  # chat message length limit
+CHAT_MAX_MSGS = 100  # total messages to store
+CHAT_MIN_MSGS = 20  # when too many messages, reduce to this many
+CHAT_MAX_BURST = 20  # max allowed messages to be sent at once
+
 urls = (
     "/authentication", "authentication",
     "/chat", "chat",
@@ -318,12 +323,40 @@ chatlog = []
 
 class chat:
     def GET(self):
+        """Retrieve chat messages from the log."""
         userData = web.input(since=0)
         since = int(userData.since)
+
+        # Client is requesting for message index beyond log length, the log
+        # must have been recently truncated. Return msgs since the truncate idx
+        if (since > CHAT_MAX_MSGS or since > len(chatlog)):
+            since = CHAT_MIN_MSGS
+
         return json.dumps(chatlog[since:])
 
     def POST(self):
+        """Add new chat messages to the log."""
+        global chatlog
         entries = json.loads(web.data())
+
+        # Client is sending too many msgs at once, truncate entries
+        if len(entries) > CHAT_MAX_BURST:
+            entries = entries[-1*CHAT_MAX_BURST:]
+
+        # If new entries will top max num of msgs, truncate chat now
+        if len(chatlog) + len(entries) > CHAT_MAX_MSGS:
+            chatlog = chatlog[-1*CHAT_MIN_MSGS:]
+
+        msgcnt = len(chatlog)
+        for entry in entries:
+            # cut down long messages to the limit
+            if len(entry["msg"]) > CHAT_MSG_LEN:
+                entry["msg"] = entry["msg"][:CHAT_MSG_LEN] + "..."
+
+            # add an index to the entry (for syncing on the client side)
+            entry["idx"] = msgcnt
+            msgcnt += 1
+
         chatlog.extend(entries)
         return resp("201", "Created")
 

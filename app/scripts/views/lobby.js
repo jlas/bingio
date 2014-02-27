@@ -23,6 +23,9 @@ define([
 ], function ($, _, Backbone, Bootstrap, Cookies, tmpl, chattmpl, ChatCollection, GamesCollection, ChatModel, Util) {
     'use strict';
 
+    var CHATLOG_MAX_ENTRIES = 100;  // max # of msgs to show in chat log
+    var CHATLOG_TRUNCATE_TO = 50;  // truncate # msgs to this if over limit
+
     // uuid generator
     function uuid() {
         function s4() {
@@ -71,8 +74,13 @@ define([
         },
 
         renderChat: function() {
-            // remove temporary placeholder messages from this user
+            // Remove temporary placeholder messages from this user
             $('#chat-log > p[data-placeholder="true"]').remove();
+
+            // Truncate the chat log if it is getting too large
+            if ($("#chat-log > p").length > CHATLOG_MAX_ENTRIES) {
+                $("#chat-log > p").slice(CHATLOG_TRUNCATE_TO).remove();
+            }
 
             var chattmpl = this.chattmpl;
             var curUserUrl = this.curUser.url;
