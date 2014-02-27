@@ -23,6 +23,8 @@ define([
 ], function ($, _, Backbone, Bootstrap, Cookies, tmpl, chattmpl, ChatCollection, GamesCollection, ChatModel, Util) {
     'use strict';
 
+    var enc = encodeURIComponent;
+
     var CHATLOG_MAX_ENTRIES = 100;  // max # of msgs to show in chat log
     var CHATLOG_TRUNCATE_TO = 50;  // truncate # msgs to this if over limit
 
@@ -95,7 +97,7 @@ define([
                 $chatlog.prepend(chattmpl({
                     'userName': entry.get('userName'),
                     'userUrl': entry.get('userUrl'),
-                    'msg': entry.get('msg'),
+                    'msg': Util.esc(entry.get('msg')),
                     'cssClass': cssClass,
                     'placeholder': 'false'
                 }));
@@ -119,7 +121,7 @@ define([
 
             this.gamesCollection.each(function(entry) {
                 $games.append(gametmpl({
-                    'name': entry.get('name'),
+                    'name': Util.esc(entry.get('name')),
                     '_id': entry.get('_id'),
                     'numPlayers': _.keys(entry.get('users')).length
                 }));
@@ -132,7 +134,7 @@ define([
             this.chatCollection.sendMessage(
                 this.curUser.name,
                 this.curUser.url,
-                $chatin.val());
+                enc($chatin.val()));
 
             // Add placeholder message for recent messages, for better ux.
             // On the next chat Ajax update we'll clear these and replace
@@ -141,7 +143,7 @@ define([
             $chatlog.prepend(this.chattmpl({
                 'userName': this.curUser.name,
                 'userUrl': this.curUser.url,
-                'msg': $chatin.val(),
+                'msg': Util.esc($chatin.val()),
                 'cssClass': 'chat-entry-me',
                 'placeholder': 'true'
             }));
@@ -151,9 +153,9 @@ define([
 
         createGame: function(evt) {
             evt.preventDefault();
-            var name = $('#game-name-input').val();
+            var name = enc($('#game-name-input').val());
             var source = $('input[name="source"]:checked').val();
-            var playlist = $('#playlist-input').val();
+            var playlist = enc($('#playlist-input').val());
             var gameId = uuid();
             var enterGame = _.bind(this.enterGame, this);
 

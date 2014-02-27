@@ -14,6 +14,15 @@ define([
 
     var that = {};
 
+    /**
+     * Escape html. For displaying user input.
+     * @param str: {string} string to escape
+     */
+    that.esc = function(str) {
+        return $('<div/>').text(str).html();
+    }
+
+    // Render the Loading screen
     that.doLoading = function () {
         $('#app').html(
             '<p id="loading"><i class="fa fa-spinner fa-spin"></i>&nbsp;Loading...</p>');

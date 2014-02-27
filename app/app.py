@@ -9,6 +9,7 @@ import os
 from os.path import dirname
 import random
 import sys
+import urllib
 import uuid
 
 import web
@@ -47,6 +48,13 @@ def rdio():
                Rdio("2qezg84b8hhpuza5naty3z6f", "XwNhEgtNy4", {})
     return rdio
 
+
+def dec(encstr):
+    """Return a decoded URI Component.
+    @param encstr (string) encoded with encodeURIComponent on client
+    @return (str)
+    """
+    return urllib.unquote(encstr.encode("utf-8")).decode("utf-8")
 
 def resp(code, status, data=None):
     """Return a wrapped response and set response status.
@@ -186,10 +194,12 @@ class game:
         userData = json.loads(web.data())
 
         # create track data, playlist is optional
-        tracks = self._makeTracks(userData["source"], userData.get("playlist"))
+        tracks = self._makeTracks(
+            userData["source"], dec(userData.get("playlist")))
 
         # create the resource and add to global dict
-        gameStore[_id] = game = self._makeResource(_id, userData["name"], tracks)
+        gameStore[_id] = game = self._makeResource(
+            _id, dec(userData["name"]), tracks)
 
         return resp("201", "Created", game)
 
@@ -389,9 +399,14 @@ class chat:
 
         msgcnt = len(chatlog)
         for entry in entries:
+            # decode urlEncoded chat input
+            msg = dec(entry["msg"])
+
             # cut down long messages to the limit
-            if len(entry["msg"]) > CHAT_MSG_LEN:
-                entry["msg"] = entry["msg"][:CHAT_MSG_LEN] + "..."
+            if len(msg) > CHAT_MSG_LEN:
+                msg = msg[:CHAT_MSG_LEN] + "..."
+
+            entry["msg"] = msg
 
             # add an index to the entry (for syncing on the client side)
             entry["idx"] = msgcnt
