@@ -37,6 +37,8 @@ define([
         },
 
         startFetching: function() {
+            clearTimeout(CHAT_TIMEOUTID);
+
             var chatCollection = this;
             function fetchChat() {
                 chatCollection.fetching = true;
@@ -67,7 +69,7 @@ define([
                     CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
                 });
             }
-            fetchChat();
+            CHAT_TIMEOUTID = setTimeout(fetchChat, 100);
         },
 
         stopFetching: function() {
