@@ -15,6 +15,9 @@
 ## don't want to version control the build artifacts. We delete the scratch
 ## repo when we're done.
 
+RDIO_API_KEY="XXXXXXXXXXXXXXXXXXXXXXXX"
+RDIO_API_SECRET="XXXXXXXXXX"
+
 function choice {
     CHOICE=''
     local prompt="$*"
@@ -67,4 +70,8 @@ if [[ "$CHOICE" == "y" ]]; then
     # cleanup temp repo
     popd
     rm -rf $tmpdir
+
+    # set the env vars
+    heroku config:set RDIO_API_KEY=${RDIO_API_KEY}
+    heroku config:set RDIO_API_SECRET=${RDIO_API_SECRET}
 fi

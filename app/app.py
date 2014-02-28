@@ -32,6 +32,9 @@ app = web.application(urls, globals())
 
 from rdioapi import Rdio
 
+RDIO_API_KEY = os.environ.get("RDIO_API_KEY", "")
+RDIO_API_SECRET = os.environ.get("RDIO_API_SECRET", "")
+
 rdiodict = {}
 
 def rdio():
@@ -45,7 +48,7 @@ def rdio():
     rdio = rdiodict.get(playerid)
     if not rdio:
         rdio = rdiodict[playerid] = \
-               Rdio("2qezg84b8hhpuza5naty3z6f", "XwNhEgtNy4", {})
+               Rdio(RDIO_API_KEY, RDIO_API_SECRET, {})
     return rdio
 
 
