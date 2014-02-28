@@ -15,8 +15,8 @@
 ## don't want to version control the build artifacts. We delete the scratch
 ## repo when we're done.
 
-RDIO_API_KEY="XXXXXXXXXXXXXXXXXXXXXXXX"
-RDIO_API_SECRET="XXXXXXXXXX"
+RDIO_API_KEY=''
+RDIO_API_SECRET=''
 
 function choice {
     CHOICE=''
@@ -37,6 +37,16 @@ echo
 choice "Is this okay? [y/N] "
 
 if [[ "$CHOICE" == "y" ]]; then
+
+    # if Rdio auth keys missing, prompt user
+    if [[ "$RDIO_API_KEY" == "" ]]; then
+        read -p "Enter Rdio API Key: " RDIO_API_KEY
+    fi
+
+    if [[ "$RDIO_API_SECRET" == "" ]]; then
+        read -p "Enter Rdio API Shared Secret: " RDIO_API_SECRET
+    fi
+
     # use a temp repo so our alterations don't get reused
     tmpdir=$(mktemp -d -t bingio)
 
