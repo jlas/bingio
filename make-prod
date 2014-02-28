@@ -4,6 +4,13 @@
 ## bower modules required, then runs the Grunt build task. This script was
 ## tested on Mac OSX but will likely run on any Unix like system
 
+for program in npm pip; do
+    if ! type $program >/dev/null; then
+        echo "Missing dependency: $program. Quitting."
+        exit 1
+    fi
+done
+
 if ! [[ -e node_modules ]]; then
 	echo "Running 'npm install'"
 	npm install
@@ -21,3 +28,8 @@ grunt build
 pushd dist
 ln -s . static
 popd
+
+# Check if we need to run pip install
+if ! python -c "import web" 2>/dev/null; then
+    sudo pip install -r requirements.txt
+fi
