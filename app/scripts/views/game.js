@@ -76,7 +76,7 @@ define([
             }
             view.oldPlayingTrack = newPlayingTrack;
         }
-        console.log('new playing track ' + view.oldPlayingTrack);
+        // console.log('new playing track ' + view.oldPlayingTrack);
     }
 
     // wait for rdio library to load before using the rdio functions
@@ -112,9 +112,9 @@ define([
         },
 
         render: function() {
-            if (   this.game === undefined
-                || this.game.get('playState') === undefined
-                || winnerModalDisplayed) {
+            if (this.game === undefined ||
+                this.game.get('playState') === undefined ||
+                winnerModalDisplayed) {
                 return this;
             }
 

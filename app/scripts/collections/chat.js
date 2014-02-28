@@ -36,17 +36,12 @@ define([
             this.chatMsgQueue = [];
         },
 
-        isQueued: function() {
-            return (this.chatMsgQueue.length > 0);
-        },
-
         startFetching: function() {
             clearTimeout(FETCH_TIMEOUTID);
 
             var chatCollection = this;
             function fetchChat() {
                 chatCollection.fetching = true;
-                console.log("fetching...");
                 chatCollection.fetch({
                     reset: true,
                     data: {'since': chatCollection.chatIdx}
@@ -68,7 +63,6 @@ define([
                 }).fail(function(xhr) {
                     Util.doError(xhr.responseText);
                 }).always(function() {
-                    console.log('fetched');
                     chatCollection.fetching = false;
                     FETCH_TIMEOUTID = setTimeout(fetchChat, 1000);
                 });
@@ -98,13 +92,11 @@ define([
                 // Add all our queued messages, clear the queue, and sync
                 chatCollection.reset(chatCollection.chatMsgQueue);
                 chatCollection.chatMsgQueue = [];
-                console.log("sending...");
-                chatCollection.sync("create", chatCollection).done(function() {
+                chatCollection.sync('create', chatCollection).done(function() {
                     chatCollection.reset();
                 }).fail(function(xhr) {
                     $('#error').text(xhr.responseText).show().fadeOut(5000);
                 }).always(function() {
-                    console.log('sent');
                     chatCollection.startFetching();
                 });
             }

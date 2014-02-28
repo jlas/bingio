@@ -22,7 +22,7 @@ define([
         defaults: {},
 
         isFull: function() {
-            return (_.keys(this.get("users")).length >= MAX_USERS);
+            return (_.keys(this.get('users')).length >= MAX_USERS);
         },
 
         addPlayer: function(curUser, successCb) {

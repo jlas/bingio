@@ -21,7 +21,7 @@ define([
      */
     that.esc = function(str) {
         return $('<div/>').text(str).html();
-    }
+    };
 
     // Render the Loading screen
     that.doLoading = function () {
@@ -33,9 +33,9 @@ define([
     that.doError = function(msg) {
         $('#error').text(msg).show();
         _.delay(function(){
-            $("#error").fadeOut(2000);
+            $('#error').fadeOut(2000);
         }, 4000);
-    }
+    };
 
     return that;
 });

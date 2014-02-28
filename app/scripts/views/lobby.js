@@ -76,30 +76,38 @@ define([
         },
 
         renderChat: function() {
-            console.log("rendering chat");
-            // console.log(arguments);
-            if (this.chatCollection.isQueued()) {
-                return;
-            }
-
-            // Remove temporary placeholder messages from this user
-            $('#chat-log > p[data-placeholder="true"]').remove();
-
             // Truncate the chat log if it is getting too large
-            if ($("#chat-log > p").length > CHATLOG_MAX_ENTRIES) {
-                $("#chat-log > p").slice(CHATLOG_TRUNCATE_TO).remove();
+            if ($('#chat-log > p').length > CHATLOG_MAX_ENTRIES) {
+                $('#chat-log > p').slice(CHATLOG_TRUNCATE_TO).remove();
             }
 
             var chattmpl = this.chattmpl;
             var curUserUrl = this.curUser.url;
-            var $chatlog = this.$el.find('#chat-log');
+            var $chatlog = $('#chat-log');
+
+            // This function does the actual appending of msgs to the DOM.
+            // If we have pending placeholder msgs, we append after those,
+            // otherwise we append to the top of the chatlog. We use a function
+            // because the placeholders may be modified, so we need to
+            // query the DOM again each time we go to append.
+            var appendFunc = function(content) {
+                var $placeholders = $('#chat-log > p[data-placeholder="true"]');
+                if ($placeholders.length > 0) {
+                    $placeholders.last().after(content);
+                } else {
+                    $chatlog.prepend(content);
+                }
+            };
+
             this.chatCollection.each(function(entry) {
                 var isCurUser = (entry.get('userUrl') === curUserUrl);
                 var cssClass = 'chat-entry-other';
                 if (isCurUser) {
+                    // Cleanup the last placeholder message
+                    $('#chat-log > p[data-placeholder="true"]').last().remove();
                     cssClass = 'chat-entry-me';
                 }
-                $chatlog.prepend(chattmpl({
+                appendFunc(chattmpl({
                     'userName': entry.get('userName'),
                     'userUrl': entry.get('userUrl'),
                     'msg': Util.esc(entry.get('msg')),
@@ -135,7 +143,6 @@ define([
 
         sendChat: function(evt) {
             evt.preventDefault();
-            console.log('got chat input');
             var $chatin = this.$el.find('#chat-input');
             this.chatCollection.sendMessage(
                 this.curUser.name,
@@ -190,7 +197,7 @@ define([
 
         enterGame: function(game) {
             if (game.isFull()) {
-                Util.doError("Game room is full.");
+                Util.doError('Game room is full.');
                 return;
             }
             game.addPlayer(this.curUser, function() {
@@ -212,7 +219,7 @@ define([
         renderModal: function() {
             // Check if we can create any more games right now
             if (this.gamesCollection.isMaxGames()) {
-                Util.doError("Cannot create any more game rooms.");
+                Util.doError('Cannot create any more game rooms.');
                 return;
             }
             $('#create-game-modal').modal();
