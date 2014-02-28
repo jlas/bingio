@@ -3,21 +3,23 @@ bingio
 
 It's like bingo, except with music. Made with web.py & Backbone. Powered by Rdio.
 
+Try out the live demo: http://bingio.juanl.org
+
 ## Demo Video
 
 http://youtu.be/dHLPX_LekNc
-
-## Live Demo
-
-http://bingio.juanl.org
 
 ## Screenshots
 
 ![bingio](https://raw.github.com/jlas/bingio/master/media/screenshot-game.png)
 
+---
+
 * Game Lobby:
 
 ![bingio](https://raw.github.com/jlas/bingio/master/media/screenshot-lobby.png)
+
+---
 
 * Splash Screen:
 
