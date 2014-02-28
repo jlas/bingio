@@ -16,7 +16,7 @@ define([
     'use strict';
 
     var SENDQ_TIMEOUTID = null;
-    var CHAT_TIMEOUTID = null;
+    var FETCH_TIMEOUTID = null;
 
     var ChatCollection = Backbone.Collection.extend({
         model: ChatModel,
@@ -36,8 +36,12 @@ define([
             this.chatMsgQueue = [];
         },
 
+        isQueued: function() {
+            return (this.chatMsgQueue.length > 0);
+        },
+
         startFetching: function() {
-            clearTimeout(CHAT_TIMEOUTID);
+            clearTimeout(FETCH_TIMEOUTID);
 
             var chatCollection = this;
             function fetchChat() {
@@ -66,14 +70,14 @@ define([
                 }).always(function() {
                     console.log('fetched');
                     chatCollection.fetching = false;
-                    CHAT_TIMEOUTID = setTimeout(fetchChat, 1000);
+                    FETCH_TIMEOUTID = setTimeout(fetchChat, 1000);
                 });
             }
-            CHAT_TIMEOUTID = setTimeout(fetchChat, 100);
+            FETCH_TIMEOUTID = setTimeout(fetchChat, 100);
         },
 
         stopFetching: function() {
-            clearTimeout(CHAT_TIMEOUTID);
+            clearTimeout(FETCH_TIMEOUTID);
         },
 
         // Here we queue up chat messages that arrive in quick succession e.g.
