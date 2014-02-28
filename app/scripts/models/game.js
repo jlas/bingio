@@ -9,8 +9,9 @@
 
 define([
     'underscore',
-    'backbone'
-], function (_, Backbone) {
+    'backbone',
+    'helpers/util'
+], function (_, Backbone, Util) {
     'use strict';
 
     var MAX_USERS = 6;  // max users allowed in a game
@@ -56,7 +57,7 @@ define([
                 game.fetch({
                     reset: true,
                     error: function(model, xhr) {
-                        $('error').text(xhr.responseText).show().fadeOut(5000);
+                        Util.doError(xhr.responseText);
                     }
                 });
                 GAME_TIMEOUTID = setTimeout(fetchGame, 2000);

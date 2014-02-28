@@ -95,7 +95,7 @@ define([
                 chatCollection.sync('create', chatCollection).done(function() {
                     chatCollection.reset();
                 }).fail(function(xhr) {
-                    $('#error').text(xhr.responseText).show().fadeOut(5000);
+                    Util.doError(xhr.responseText);
                 }).always(function() {
                     chatCollection.startFetching();
                 });

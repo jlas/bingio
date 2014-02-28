@@ -12,7 +12,9 @@ import sys
 import urllib
 import uuid
 
+from rdioapi import Rdio
 import web
+
 
 CHAT_MSG_LEN = 400  # chat message length limit
 CHAT_MAX_MSGS = 100  # total messages to store
@@ -30,12 +32,13 @@ urls = (
     )
 app = web.application(urls, globals())
 
-from rdioapi import Rdio
+rdiodict = {}
+gameStore = {}
+chatlog = []
+
 
 RDIO_API_KEY = os.environ.get("RDIO_API_KEY", "")
 RDIO_API_SECRET = os.environ.get("RDIO_API_SECRET", "")
-
-rdiodict = {}
 
 def rdio():
     """Get the Rdio API object for user based on a UUID cookie
@@ -50,6 +53,10 @@ def rdio():
         rdio = rdiodict[playerid] = \
                Rdio(RDIO_API_KEY, RDIO_API_SECRET, {})
     return rdio
+
+
+class Error(Exception):
+    pass
 
 
 def dec(encstr):
@@ -72,8 +79,6 @@ def resp(code, status, data=None):
     else:
         resp = {"code": code, "status": status}
     return json.dumps(resp)
-
-gameStore = {}
 
 
 class authentication:
@@ -118,16 +123,20 @@ class game:
         return resp("200", "Ok", gameStore[_id])
 
     def _makeTracks(self, source, playlist=None):
+        """Generate tracks based on user input
+        @param source (str) what tracks to use, one of: top charts,
+          collection, or playlist
+        @param playlist (str) if source == playlist, use this as the playlist
+          name
+        @return tracks (dict)
+        """
         user = rdio().currentUser()
+        tracks = []
 
         # get top 100 tracks in collection, sorted by playCount
         if source == "collection":
             tracks = rdio().getTracksInCollection(
                 user=user["key"], sort="playCount", count=100)
-
-        # get top 50 tracks in top charts
-        elif source == "charts":
-            tracks = rdio().getTopCharts(type="Track", count=50)
 
         # get tracks in a playlist
         elif source == "playlist" and playlist:
@@ -137,6 +146,17 @@ class game:
                 if pl["name"].lower() == playlist.lower():
                     tracks = pl["tracks"]
                     break
+            else:
+                raise Error("No playlist found by that name")
+
+        # get top 50 tracks in top charts
+        elif source == "charts":
+            tracks = rdio().getTopCharts(type="Track", count=50)
+
+        # if user's collection or playlist doesn't have enough tracks
+        if source in ["collection", "playlist"] and len(tracks) < 25:
+            raise Error("Not enough tracks in your " + source +
+                " (need at least 25), try using 'Top Tracks'")
 
         # if we have more than 25 tracks, pick a random selection of 25
         if len(tracks) > 25:
@@ -197,8 +217,11 @@ class game:
         userData = json.loads(web.data())
 
         # create track data, playlist is optional
-        tracks = self._makeTracks(
-            userData["source"], dec(userData.get("playlist")))
+        try:
+            tracks = self._makeTracks(
+                userData["source"], dec(userData.get("playlist")))
+        except Error, e:
+            return resp("400", "Bad Request", str(e))
 
         # create the resource and add to global dict
         gameStore[_id] = game = self._makeResource(
@@ -371,8 +394,6 @@ class games:
     def GET(self):
         return json.dumps(gameStore.values())
 
-
-chatlog = []
 
 class chat:
     def GET(self):

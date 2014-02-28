@@ -19,7 +19,10 @@ body {
 	justify-content: center;
 }
 
-#error { padding: 20px 40px; }
+#error {
+	padding: 20px 40px;
+	z-index: 9999;
+}
 
 img[alt="icon"] {
 	border-radius: 50%;

@@ -180,12 +180,24 @@ define([
             }, {
                 wait: true,
                 success: function() {
-                    game.fetch({
-                        success: function() { enterGame(game); }
+                    game.fetch().done(function() {
+                        enterGame(game);
                     });
                 },
                 error: function(model, xhr) {
                     Util.doError(xhr.responseText);
+
+                    // Here we want to go back to the lobby since the loading
+                    // screen is up, but we're already at the lobby url. So we
+                    // hack the navigate mechanism by navigating to root then
+                    // back to lobby.
+                    Backbone.history.navigate('/', {
+                        trigger: false,
+                        replace: true  // replace url but dont add to history
+                    });
+                    Backbone.history.navigate('lobby', {
+                        trigger: true
+                    });
                 }
             });
 

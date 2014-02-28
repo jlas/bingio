@@ -10,8 +10,9 @@
 define([
     'underscore',
     'backbone',
-    'models/game'
-], function (_, Backbone, GameModel) {
+    'models/game',
+    'helpers/util'
+], function (_, Backbone, GameModel, Util) {
     'use strict';
 
     var MAX_GAMES = 500;  // Max number of creatable games
@@ -32,7 +33,7 @@ define([
                 gamesCollection.fetch({
                     reset: true,
                     error: function(model, xhr) {
-                        $('error').text(xhr.responseText).show().fadeOut(5000);
+                        Util.doError(xhr.responseText);
                     }
                 });
                 GAMES_TIMEOUTID = setTimeout(fetchGames, 2000);
