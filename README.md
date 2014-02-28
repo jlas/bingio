@@ -39,6 +39,10 @@ Run the game server:
 
 ... now you can visit http://localhost:8000 and start playing.
 
+Connecting with Rdio requires API Keys, visit http://www.rdio.com/developers/
+to create your keys. By default <code>app.py</code> will check environment
+variables for keys, or you can edit <code>app.py</code> to use yours directly.
+
 Running <code>make-prod</code> will create a <code>dist/</code> directory. This
 directory essentially contains the "production" environment, i.e. all the built
 and minified client files are found here.
