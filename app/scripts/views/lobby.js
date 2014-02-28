@@ -78,7 +78,7 @@ define([
         renderChat: function() {
             console.log("rendering chat");
             // console.log(arguments);
-            if (!this.chatCollection.isQueued()) {
+            if (this.chatCollection.isQueued()) {
                 return;
             }
 
