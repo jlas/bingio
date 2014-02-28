@@ -76,8 +76,8 @@ define([
         },
 
         renderChat: function() {
-            console.log("rengering chat");
-            console.log(arguments);
+            console.log("rendering chat");
+            // console.log(arguments);
             // Remove temporary placeholder messages from this user
             $('#chat-log > p[data-placeholder="true"]').remove();
 
@@ -131,6 +131,7 @@ define([
 
         sendChat: function(evt) {
             evt.preventDefault();
+            console.log('got chat input');
             var $chatin = this.$el.find('#chat-input');
             this.chatCollection.sendMessage(
                 this.curUser.name,
