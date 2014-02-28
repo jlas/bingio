@@ -40,6 +40,7 @@ define([
             var chatCollection = this;
             function fetchChat() {
                 chatCollection.fetching = true;
+                console.log("fetching...");
                 chatCollection.fetch({
                     reset: true,
                     data: {'since': chatCollection.chatIdx}
@@ -91,6 +92,7 @@ define([
                 // Add all our queued messages, clear the queue, and sync
                 chatCollection.reset(chatCollection.chatMsgQueue);
                 chatCollection.chatMsgQueue = [];
+                console.log("sending...");
                 chatCollection.sync("create", chatCollection).done(function() {
                     chatCollection.reset();
                 }).fail(function(xhr) {

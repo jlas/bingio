@@ -76,6 +76,7 @@ define([
         },
 
         renderChat: function() {
+            console.log("rengering chat");
             console.log(arguments);
             // Remove temporary placeholder messages from this user
             $('#chat-log > p[data-placeholder="true"]').remove();
