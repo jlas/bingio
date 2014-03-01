@@ -71,15 +71,12 @@ def resp(code, status, data=None):
     @param code: http return code
     @param status: success, error, failure
     @param data: data to return
-    @return json string
+    @return json string or empty string on error
     """
     web.ctx.status = " ".join([code, status])
     if not data is None:
-        resp = data
-    else:
-        resp = {"code": code, "status": status}
-    return json.dumps(resp)
-
+        return json.dumps(data)
+    return ""
 
 class authentication:
     """OAuth authentication and endpoint for basic user data."""

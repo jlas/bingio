@@ -40,6 +40,11 @@ define([
             ;
         }
 
+        // don't display an empty message
+        if (!msg) {
+            return;
+        }
+
         $('#error').text(msg).show();
         _.delay(function(){
             $('#error').fadeOut(2000);
