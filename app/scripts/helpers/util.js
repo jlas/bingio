@@ -41,7 +41,7 @@ define([
         }
 
         // don't display an empty message
-        if (!msg) {
+        if (msg === "") {
             return;
         }
 
