@@ -32,12 +32,12 @@ define([
     // Display an error message
     that.doError = function(msg) {
         try {
-          var parsed = $.parseJSON(msg);
-          if (typeof parsed === 'string') {
-            msg = parsed;
-          }
+            var parsed = $.parseJSON(msg);
+            if (typeof parsed === 'string') {
+                msg = parsed;
+            }
         } catch (e) {
-          ;
+            ;
         }
 
         $('#error').text(msg).show();
