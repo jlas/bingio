@@ -129,6 +129,11 @@ dd, dt { float: left; }
 	margin-top: 2em;
 }
 
+#game-board {
+	max-width: 1280px;
+	margin: 0 auto;
+}
+
 /* [X] symbols for wrong guesses */
 $x-symbol-align: -95px;
 .fa-stack > .fa-times { top: $x-symbol-align - 2px; }
