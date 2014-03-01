@@ -55,17 +55,22 @@ footer { margin-top: 10px; }
 }
 
 #splash-form > p:first-child { margin-top: 30px; }
-#splash-form p { text-align: center; }
-#splash-form input { margin: 10px 0 20px 0; }
-#splash-form img {
+#splash-form > p {
+	text-align: center;
+	margin: 10px 0 0 0;
+}
+#splash-form input { margin: 10px 0 10px 0; }
+#powered-by > img {
 	position: relative;
 	top: -3px;
 }
 #splash-form > p > iframe { border: 1px black solid; }
 
 .logo {
+	margin-top: 10px;
 	text-align: center;
 }
+.logo-big { margin-top: 0; }
 
 #how-to-btn { border-radius: 0; }
 
